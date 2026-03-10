@@ -2,7 +2,7 @@
 // CONFIGURE AQUI
 // ===============================
 const EMAILJS_PUBLIC_KEY = "4gFOKUyAnp4r6vTku";
-const EMAILJS_SERVICE_ID = "SINDPOL";
+const EMAILJS_SERVICE_ID = "service_er8b0ac";
 const EMAILJS_TEMPLATE_ID = "template_mqw92lw";
 const DESTINO_EMAIL = "gomeserosiane.dev@gmail.com";
 
