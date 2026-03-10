@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulário de Cadastro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container" id="form-wrapper">
+    <header class="form-header">
+      <img
+        src="src/logo sindpol.png"
+        alt="Imagem de cabeçalho"
+        class="header-image"
+      />
+      <div class="header-content">
+        <h1>Formulário de Cadastro</h1>
+        <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1><br>
+        <h2>Preencha o formulário com atenção</h2>
+      </div>
+    </header>
+
+    <form id="cadastroForm">
+      <!-- DADOS PESSOAIS -->
+      <section class="form-section">
+        <h2>Dados pessoais</h2>
+
+        <div class="grid">
+          <div class="field full">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required />
+          </div>
+
+          <div class="field">
+            <label for="rg">RG:</label>
+            <input type="text" id="rg" name="rg" />
+          </div>
+
+          <div class="field">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" />
+          </div>
+
+          <div class="field">
+            <label for="matricula">Matrícula Func.:</label>
+            <input type="text" id="matricula" name="matricula" />
+          </div>
+
+          <div class="field">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" name="sexo" required>
+              <option value="">Selecione</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Masculino">Masculino</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="admissao">Data da admissão:</label>
+            <input type="date" id="admissao" name="admissao" />
+          </div>
+
+          <div class="field">
+            <label for="nascimento">Data do nascimento:</label>
+            <input type="date" id="nascimento" name="nascimento" />
+          </div>
+
+          <div class="field">
+            <label for="tipoSanguineo">Tipo sanguíneo:</label>
+            <select id="tipoSanguineo" name="tipoSanguineo">
+              <option value="">Selecione</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+              <option>Não sei</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="risp">RISP:</label>
+            <input type="text" id="risp" name="risp" />
+          </div>
+        </div>
+      </section>
+
+      <!-- DADOS PARA CONTATO -->
+      <section class="form-section">
+        <h2>Dados para contato</h2>
+
+        <div class="grid">
+          <div class="field full">
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" />
+          </div>
+
+          <div class="field">
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" maxlength="9" />
+          </div>
+
+          <div class="field">
+            <label for="bairro">Bairro:</label>
+            <input type="text" id="bairro" name="bairro" />
+          </div>
+
+          <div class="field">
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" />
+          </div>
+
+          <div class="field">
+            <label for="uf">UF:</label>
+            <input type="text" id="uf" name="uf" maxlength="2" />
+          </div>
+
+          <div class="field">
+            <label for="telefone">Telefone WhatsApp:</label>
+            <input type="text" id="telefone" name="telefone" />
+          </div>
+
+          <div class="field full">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+        </div>
+      </section>
+
+      <!-- DADOS COMPLEMENTARES -->
+      <section class="form-section">
+        <h2>Dados Complementares</h2>
+
+        <div class="grid">
+          <div class="field">
+            <label for="estadoCivil">Estado civil:</label>
+            <select id="estadoCivil" name="estadoCivil">
+              <option value="">Selecione</option>
+              <option>Solteiro(a)</option>
+              <option>Casado(a)</option>
+              <option>União Estável</option>
+              <option>Divorciado(a)</option>
+              <option>Viúvo(a)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargo" name="cargo" />
+          </div>
+
+          <div class="field">
+            <label for="lotacao">Lotação:</label>
+            <input type="text" id="lotacao" name="lotacao" />
+          </div>
+
+          <div class="field">
+            <label for="classe">Classe:</label>
+            <input type="text" id="classe" name="classe" />
+          </div>
+
+          <div class="field">
+            <label for="situacaoFuncional">Situação funcional:</label>
+            <select id="situacaoFuncional" name="situacaoFuncional">
+              <option value="">Selecione</option>
+              <option value="Ativo">Ativo</option>
+              <option value="Aposentado">Aposentado</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="nomeMae">Nome da mãe:</label>
+            <input type="text" id="nomeMae" name="nomeMae" />
+          </div>
+
+          <div class="field full">
+            <label for="nomePai">Nome do pai:</label>
+            <input type="text" id="nomePai" name="nomePai" />
+          </div>
+        </div>
+      </section>
+
+      <!-- DEPENDENTES -->
+      <section class="form-section">
+        <h2>Dados dos Beneficiários/Dependentes</h2>
+
+        <div id="dependentes-container"></div>
+
+        <button type="button" class="btn btn-secondary" id="addDependenteBtn">
+          + Adicionar dependente
+        </button>
+      </section>
+
+      <!-- ASSINATURA -->
+      <section class="form-section">
+        <h2>Assinatura digital</h2>
+        <p class="signature-tip">Assine no campo abaixo:</p>
+
+        <div class="signature-box">
+          <canvas id="signature-pad"></canvas>
+        </div>
+
+        <div class="signature-actions">
+          <button type="button" class="btn btn-outline" id="clearSignatureBtn">
+            Limpar assinatura
+          </button>
+        </div>
+      </section>
+
+      <!-- AÇÕES -->
+      <section class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          Enviar formulário
+        </button>
+      </section>
+    </form>
+  </div>
+
+  <!-- LIBS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>
