@@ -1,30 +1,23 @@
 // ===============================
-// CONFIGURE AQUI
+// ELEMENTOS DOM
 // ===============================
-const EMAILJS_PUBLIC_KEY = "4gFOKUyAnp4r6vTku";
-const EMAILJS_SERVICE_ID = "service_er8b0ac";
-const EMAILJS_TEMPLATE_ID = "template_mqw92lw";
-const DESTINO_EMAIL = "gomeserosiane.dev@gmail.com";
-
-// ===============================
-// INICIALIZA EMAILJS
-// ===============================
-emailjs.init({
-  publicKey: EMAILJS_PUBLIC_KEY,
-});
-
 const form = document.getElementById("cadastroForm");
 const addDependenteBtn = document.getElementById("addDependenteBtn");
 const dependentesContainer = document.getElementById("dependentes-container");
 const cepInput = document.getElementById("cep");
 const submitBtn = document.getElementById("submitBtn");
 const formWrapper = document.getElementById("form-wrapper");
+const canvas = document.getElementById("signature-pad");
+const clearSignatureBtn = document.getElementById("clearSignatureBtn");
+
+let signaturePad;
+let dependenteIndex = 0;
 
 // ===============================
-// MÁSCARAS
+// FUNÇÕES AUXILIARES
 // ===============================
 function onlyNumbers(value) {
-  return value.replace(/\D/g, "");
+  return (value || "").replace(/\D/g, "");
 }
 
 function formatCPF(value) {
@@ -43,6 +36,7 @@ function formatCEP(value) {
 
 function formatPhone(value) {
   value = onlyNumbers(value).slice(0, 11);
+
   if (value.length <= 10) {
     value = value.replace(/(\d{2})(\d)/, "($1) $2");
     value = value.replace(/(\d{4})(\d)/, "$1-$2");
@@ -50,20 +44,54 @@ function formatPhone(value) {
     value = value.replace(/(\d{2})(\d)/, "($1) $2");
     value = value.replace(/(\d{5})(\d)/, "$1-$2");
   }
+
   return value;
 }
 
-document.getElementById("cpf").addEventListener("input", (e) => {
-  e.target.value = formatCPF(e.target.value);
-});
+function getFormattedToday() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mi = String(now.getMinutes()).padStart(2, "0");
 
-document.getElementById("cep").addEventListener("input", (e) => {
-  e.target.value = formatCEP(e.target.value);
-});
+  return `${yyyy}-${mm}-${dd}_${hh}-${mi}`;
+}
 
-document.getElementById("telefone").addEventListener("input", (e) => {
-  e.target.value = formatPhone(e.target.value);
-});
+function sanitizeFileName(value) {
+  return String(value || "formulario")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+}
+
+// ===============================
+// MÁSCARAS
+// ===============================
+const cpfInput = document.getElementById("cpf");
+const telefoneInput = document.getElementById("telefone");
+
+if (cpfInput) {
+  cpfInput.addEventListener("input", (e) => {
+    e.target.value = formatCPF(e.target.value);
+  });
+}
+
+if (cepInput) {
+  cepInput.addEventListener("input", (e) => {
+    e.target.value = formatCEP(e.target.value);
+  });
+}
+
+if (telefoneInput) {
+  telefoneInput.addEventListener("input", (e) => {
+    e.target.value = formatPhone(e.target.value);
+  });
+}
 
 // ===============================
 // VIA CEP
@@ -82,15 +110,17 @@ async function buscarCEP(cep) {
       return;
     }
 
-    document.getElementById("bairro").value = data.bairro || "";
-    document.getElementById("cidade").value = data.localidade || "";
-    document.getElementById("uf").value = data.uf || "";
+    const enderecoInput = document.getElementById("endereco");
+    const bairroInput = document.getElementById("bairro");
+    const cidadeInput = document.getElementById("cidade");
+    const ufInput = document.getElementById("uf");
 
-    if (data.logradouro) {
-      const enderecoAtual = document.getElementById("endereco").value.trim();
-      if (!enderecoAtual) {
-        document.getElementById("endereco").value = data.logradouro;
-      }
+    if (bairroInput) bairroInput.value = data.bairro || "";
+    if (cidadeInput) cidadeInput.value = data.localidade || "";
+    if (ufInput) ufInput.value = data.uf || "";
+
+    if (enderecoInput && !enderecoInput.value.trim()) {
+      enderecoInput.value = data.logradouro || "";
     }
   } catch (error) {
     console.error("Erro ao buscar CEP:", error);
@@ -98,17 +128,17 @@ async function buscarCEP(cep) {
   }
 }
 
-cepInput.addEventListener("blur", () => {
-  buscarCEP(cepInput.value);
-});
+if (cepInput) {
+  cepInput.addEventListener("blur", () => {
+    buscarCEP(cepInput.value);
+  });
+}
 
 // ===============================
 // DEPENDENTES DINÂMICOS
 // ===============================
-let dependenteIndex = 0;
-
 function criarDependenteCard() {
-  dependenteIndex++;
+  dependenteIndex += 1;
 
   const card = document.createElement("div");
   card.className = "dependente-card";
@@ -117,25 +147,25 @@ function criarDependenteCard() {
   card.innerHTML = `
     <div class="dependente-top">
       <span class="dependente-title">Dependente ${dependenteIndex}</span>
-      <button type="button" class="btn btn-danger delete-btn">
+      <button type="button" class="btn btn-danger delete-btn" aria-label="Excluir dependente">
         🗑 Excluir
       </button>
     </div>
 
     <div class="grid">
       <div class="field full">
-        <label>Nome:</label>
-        <input type="text" name="dependente_nome_${dependenteIndex}" />
+        <label for="dependente_nome_${dependenteIndex}">Nome:</label>
+        <input type="text" id="dependente_nome_${dependenteIndex}" name="dependente_nome_${dependenteIndex}" />
       </div>
 
       <div class="field">
-        <label>Parentesco:</label>
-        <input type="text" name="dependente_parentesco_${dependenteIndex}" />
+        <label for="dependente_parentesco_${dependenteIndex}">Parentesco:</label>
+        <input type="text" id="dependente_parentesco_${dependenteIndex}" name="dependente_parentesco_${dependenteIndex}" />
       </div>
 
       <div class="field">
-        <label>Data de nascimento:</label>
-        <input type="date" name="dependente_nascimento_${dependenteIndex}" />
+        <label for="dependente_nascimento_${dependenteIndex}">Data de nascimento:</label>
+        <input type="date" id="dependente_nascimento_${dependenteIndex}" name="dependente_nascimento_${dependenteIndex}" />
       </div>
     </div>
   `;
@@ -148,197 +178,175 @@ function criarDependenteCard() {
   dependentesContainer.appendChild(card);
 }
 
-addDependenteBtn.addEventListener("click", criarDependenteCard);
+if (addDependenteBtn) {
+  addDependenteBtn.addEventListener("click", criarDependenteCard);
+}
 
 // ===============================
 // ASSINATURA DIGITAL
 // ===============================
-const canvas = document.getElementById("signature-pad");
-const clearSignatureBtn = document.getElementById("clearSignatureBtn");
-let signaturePad;
+function initSignaturePad() {
+  if (!canvas) return;
 
-function resizeCanvas() {
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
   const parentWidth = canvas.parentElement.offsetWidth;
+
+  const previousData =
+    signaturePad && !signaturePad.isEmpty() ? signaturePad.toData() : null;
 
   canvas.width = parentWidth * ratio;
   canvas.height = 240 * ratio;
   canvas.style.width = `${parentWidth}px`;
-  canvas.style.height = `240px`;
+  canvas.style.height = "240px";
 
   const ctx = canvas.getContext("2d");
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(ratio, ratio);
 
   signaturePad = new SignaturePad(canvas, {
-    minWidth: 1,
-    maxWidth: 2.5,
+    minWidth: 0.8,
+    maxWidth: 2,
     penColor: "#111827",
-    backgroundColor: "rgba(255,255,255,1)",
+    backgroundColor: "rgb(255,255,255)",
+  });
+
+  if (previousData) {
+    signaturePad.fromData(previousData);
+  }
+}
+
+initSignaturePad();
+window.addEventListener("resize", initSignaturePad);
+
+if (clearSignatureBtn) {
+  clearSignatureBtn.addEventListener("click", () => {
+    if (signaturePad) {
+      signaturePad.clear();
+    }
   });
 }
 
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-clearSignatureBtn.addEventListener("click", () => {
-  signaturePad.clear();
-});
-
 // ===============================
-// COLETAR DEPENDENTES
+// PREPARAR FORMULÁRIO PARA CAPTURA
 // ===============================
-function getDependentes() {
-  const cards = [...document.querySelectorAll(".dependente-card")];
+function lockFormVisualState() {
+  const elements = formWrapper.querySelectorAll("input, select, textarea");
 
-  return cards.map((card) => {
-    const inputs = card.querySelectorAll("input");
-    return {
-      nome: inputs[0]?.value || "",
-      parentesco: inputs[1]?.value || "",
-      nascimento: inputs[2]?.value || "",
-    };
-  }).filter(dep => dep.nome || dep.parentesco || dep.nascimento);
+  elements.forEach((el) => {
+    if (el.tagName === "SELECT") {
+      const selectedText = el.options[el.selectedIndex]
+        ? el.options[el.selectedIndex].text
+        : "";
+      el.setAttribute("data-html2canvas-value", selectedText);
+    } else {
+      el.setAttribute("data-html2canvas-value", el.value || "");
+    }
+
+    el.blur();
+  });
 }
 
-function getDependentesHTML(dependentes) {
-  if (!dependentes.length) {
-    return "<p>Nenhum dependente informado.</p>";
+// ===============================
+// GERAR IMAGEM DO FORMULÁRIO
+// ===============================
+async function gerarImagemFormulario() {
+  lockFormVisualState();
+
+  const originalButtonText = submitBtn ? submitBtn.textContent : "";
+  const originalDisabled = submitBtn ? submitBtn.disabled : false;
+
+  if (submitBtn) {
+    submitBtn.textContent = "Gerando imagem...";
+    submitBtn.disabled = true;
   }
 
-  return dependentes.map((dep, index) => `
-    <div style="margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:8px;">
-      <strong>Dependente ${index + 1}</strong><br>
-      Nome: ${dep.nome || "-"}<br>
-      Parentesco: ${dep.parentesco || "-"}<br>
-      Data de nascimento: ${dep.nascimento || "-"}
-    </div>
-  `).join("");
-}
+  await new Promise((resolve) => setTimeout(resolve, 250));
 
-function getDependentesText(dependentes) {
-  if (!dependentes.length) return "Nenhum dependente informado.";
+  const targetWidth = formWrapper.scrollWidth;
+  const targetHeight = formWrapper.scrollHeight;
 
-  return dependentes.map((dep, index) => {
-    return `Dependente ${index + 1}:
-Nome: ${dep.nome || "-"}
-Parentesco: ${dep.parentesco || "-"}
-Data de nascimento: ${dep.nascimento || "-"}`;
-  }).join("\n\n");
-}
-
-// ===============================
-// GERAR PDF DO FORMULÁRIO
-// ===============================
-async function gerarPDFBase64() {
-  const { jsPDF } = window.jspdf;
-
-  const canvasForm = await html2canvas(formWrapper, {
+  const screenshotCanvas = await html2canvas(formWrapper, {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
-    scrollY: -window.scrollY
+    width: targetWidth,
+    height: targetHeight,
+    windowWidth: targetWidth,
+    windowHeight: targetHeight,
+    scrollX: 0,
+    scrollY: 0,
   });
 
-  const imgData = canvasForm.toDataURL("image/jpeg", 0.95);
-
-  const pdf = new jsPDF("p", "mm", "a4");
-  const pdfWidth = 210;
-  const pageHeight = 297;
-
-  const imgWidth = pdfWidth;
-  const imgHeight = (canvasForm.height * imgWidth) / canvasForm.width;
-
-  let heightLeft = imgHeight;
-  let position = 0;
-
-  pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+  if (submitBtn) {
+    submitBtn.textContent = originalButtonText;
+    submitBtn.disabled = originalDisabled;
   }
 
-  return pdf.output("datauristring");
+  return screenshotCanvas;
 }
 
 // ===============================
-// ENVIAR E-MAIL
+// DOWNLOAD DA IMAGEM
 // ===============================
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+function downloadCanvasImage(canvasEl) {
+  const nomeInput = document.getElementById("nome");
+  const nome = nomeInput ? nomeInput.value.trim() : "";
+  const safeName = sanitizeFileName(nome || "formulario");
+  const timestamp = getFormattedToday();
+  const fileName = `ficha_${safeName}_${timestamp}.jpg`;
 
-  if (signaturePad.isEmpty()) {
+  const imageData = canvasEl.toDataURL("image/jpeg", 0.95);
+
+  const link = document.createElement("a");
+  link.href = imageData;
+  link.download = fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// ===============================
+// ENVIO = DOWNLOAD
+// ===============================
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  if (!signaturePad || signaturePad.isEmpty()) {
     alert("Por favor, faça a assinatura digital antes de enviar.");
     return;
   }
 
   try {
-    submitBtn.textContent = "Enviando...";
-    submitBtn.disabled = true;
+    if (submitBtn) {
+      submitBtn.textContent = "Preparando download...";
+      submitBtn.disabled = true;
+    }
+
     form.classList.add("loading");
 
-    const formData = new FormData(form);
-    const dependentes = getDependentes();
+    const canvasResult = await gerarImagemFormulario();
+    downloadCanvasImage(canvasResult);
 
-    const assinaturaBase64 = signaturePad.toDataURL("image/png");
-    const pdfBase64 = await gerarPDFBase64();
-
-    const templateParams = {
-      to_email: DESTINO_EMAIL,
-
-      nome: formData.get("nome") || "",
-      rg: formData.get("rg") || "",
-      cpf: formData.get("cpf") || "",
-      matricula: formData.get("matricula") || "",
-      sexo: formData.get("sexo") || "",
-      admissao: formData.get("admissao") || "",
-      nascimento: formData.get("nascimento") || "",
-      tipoSanguineo: formData.get("tipoSanguineo") || "",
-      risp: formData.get("risp") || "",
-
-      endereco: formData.get("endereco") || "",
-      cep: formData.get("cep") || "",
-      bairro: formData.get("bairro") || "",
-      cidade: formData.get("cidade") || "",
-      uf: formData.get("uf") || "",
-      telefone: formData.get("telefone") || "",
-      email: formData.get("email") || "",
-
-      estadoCivil: formData.get("estadoCivil") || "",
-      cargo: formData.get("cargo") || "",
-      lotacao: formData.get("lotacao") || "",
-      classe: formData.get("classe") || "",
-      situacaoFuncional: formData.get("situacaoFuncional") || "",
-      nomeMae: formData.get("nomeMae") || "",
-      nomePai: formData.get("nomePai") || "",
-
-      dependentes_texto: getDependentesText(dependentes),
-      dependentes_html: getDependentesHTML(dependentes),
-
-      // anexos variáveis
-      signature_image: assinaturaBase64,
-      form_pdf: pdfBase64,
-    };
-
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      templateParams
-    );
-
-    alert("Formulário enviado com sucesso!");
-    form.reset();
-    signaturePad.clear();
-    dependentesContainer.innerHTML = "";
+    alert("Imagem do formulário baixada com sucesso.");
   } catch (error) {
-    console.error("Erro ao enviar:", error);
-    alert("Erro ao enviar formulário. Verifique sua configuração do EmailJS.");
+    console.error("Erro ao gerar imagem do formulário:", error);
+    alert("Não foi possível gerar o download da imagem do formulário.");
   } finally {
-    submitBtn.textContent = "Enviar formulário";
-    submitBtn.disabled = false;
+    if (submitBtn) {
+      submitBtn.textContent = "Enviar formulário";
+      submitBtn.disabled = false;
+    }
+
     form.classList.remove("loading");
   }
-});
+}
+
+if (form) {
+  form.addEventListener("submit", handleSubmit);
+}
