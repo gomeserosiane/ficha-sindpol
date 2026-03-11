@@ -48,7 +48,7 @@ body {
 }
 
 .header-content {
-    text-align: center;
+  text-align: center;
   padding: 24px 28px;
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.08));
   border-bottom: 1px solid var(--border);
@@ -229,30 +229,4 @@ textarea:focus {
 .loading {
   opacity: 0.7;
   pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-content h1 {
-    font-size: 1.6rem;
-  }
-
-  form {
-    padding: 18px;
-  }
-
-  .form-section {
-    padding: 18px;
-  }
-
-  .form-actions {
-    justify-content: stretch;
-  }
-
-  .form-actions .btn {
-    width: 100%;
-  }
 }

@@ -1,0 +1,35 @@
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-image {
+        height: 70px;
+    }
+
+    .header-content h1 {
+        font-size: 1.6rem;
+    }
+
+    form {
+        padding: 18px;
+    }
+
+    .form-section {
+        padding: 18px;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 95%;
+    }
+}
