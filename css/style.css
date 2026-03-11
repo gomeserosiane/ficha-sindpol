@@ -175,6 +175,16 @@ textarea:focus {
   background: #f8fafc;
 }
 
+.btn-alternar {
+  background: #fcee73;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-alternar:hover {
+  background: #ecdf6a;
+}
+
 .btn-danger {
   background: var(--danger);
   color: #fff;
