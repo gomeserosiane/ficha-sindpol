@@ -1,16 +1,29 @@
 // ===============================
 // ELEMENTOS DOM
 // ===============================
-const form = document.getElementById("cadastroForm");
-const addDependenteBtn = document.getElementById("addDependenteBtn");
-const dependentesContainer = document.getElementById("dependentes-container");
-const cepInput = document.getElementById("cep");
-const submitBtn = document.getElementById("submitBtn");
+const form1 = document.getElementById("cadastroForm1");
+const form2 = document.getElementById("cadastroForm2");
 const formWrapper = document.getElementById("form-wrapper");
-const canvas = document.getElementById("signature-pad");
-const clearSignatureBtn = document.getElementById("clearSignatureBtn");
 
-let signaturePad;
+const dependentesContainer = document.getElementById("dependentes-container");
+const addDependenteBtn = document.getElementById("addDependenteBtn");
+
+const toggleButtons = document.querySelectorAll(".toggleFormBtn");
+const clearSignatureButtons = document.querySelectorAll(".clear-signature-btn");
+
+const form1Cpf = document.getElementById("f1_cpf");
+const form1Cep = document.getElementById("f1_cep");
+const form1Telefone = document.getElementById("f1_telefone");
+
+const form2Cpf = document.getElementById("f2_cpf");
+const form2Cep = document.getElementById("f2_cep");
+const form2Telefone = document.getElementById("f2_telefone");
+
+const form1Canvas = document.getElementById("signature-pad-1");
+const form2Canvas = document.getElementById("signature-pad-2");
+
+let signaturePad1;
+let signaturePad2;
 let dependenteIndex = 0;
 
 // ===============================
@@ -69,26 +82,51 @@ function sanitizeFileName(value) {
     .toLowerCase();
 }
 
+function getActiveForm() {
+  return document.querySelector(".form-page.active-form");
+}
+
+function getActiveSignaturePad() {
+  const activeForm = getActiveForm();
+  if (!activeForm) return null;
+  return activeForm.id === "cadastroForm1" ? signaturePad1 : signaturePad2;
+}
+
 // ===============================
 // MÁSCARAS
 // ===============================
-const cpfInput = document.getElementById("cpf");
-const telefoneInput = document.getElementById("telefone");
-
-if (cpfInput) {
-  cpfInput.addEventListener("input", (e) => {
+if (form1Cpf) {
+  form1Cpf.addEventListener("input", (e) => {
     e.target.value = formatCPF(e.target.value);
   });
 }
 
-if (cepInput) {
-  cepInput.addEventListener("input", (e) => {
+if (form2Cpf) {
+  form2Cpf.addEventListener("input", (e) => {
+    e.target.value = formatCPF(e.target.value);
+  });
+}
+
+if (form1Cep) {
+  form1Cep.addEventListener("input", (e) => {
     e.target.value = formatCEP(e.target.value);
   });
 }
 
-if (telefoneInput) {
-  telefoneInput.addEventListener("input", (e) => {
+if (form2Cep) {
+  form2Cep.addEventListener("input", (e) => {
+    e.target.value = formatCEP(e.target.value);
+  });
+}
+
+if (form1Telefone) {
+  form1Telefone.addEventListener("input", (e) => {
+    e.target.value = formatPhone(e.target.value);
+  });
+}
+
+if (form2Telefone) {
+  form2Telefone.addEventListener("input", (e) => {
     e.target.value = formatPhone(e.target.value);
   });
 }
@@ -96,7 +134,7 @@ if (telefoneInput) {
 // ===============================
 // VIA CEP
 // ===============================
-async function buscarCEP(cep) {
+async function buscarCEP(cep, prefix) {
   const cepLimpo = onlyNumbers(cep);
 
   if (cepLimpo.length !== 8) return;
@@ -110,10 +148,10 @@ async function buscarCEP(cep) {
       return;
     }
 
-    const enderecoInput = document.getElementById("endereco");
-    const bairroInput = document.getElementById("bairro");
-    const cidadeInput = document.getElementById("cidade");
-    const ufInput = document.getElementById("uf");
+    const enderecoInput = document.getElementById(`${prefix}_endereco`);
+    const bairroInput = document.getElementById(`${prefix}_bairro`);
+    const cidadeInput = document.getElementById(`${prefix}_cidade`);
+    const ufInput = document.getElementById(`${prefix}_uf`);
 
     if (bairroInput) bairroInput.value = data.bairro || "";
     if (cidadeInput) cidadeInput.value = data.localidade || "";
@@ -128,9 +166,15 @@ async function buscarCEP(cep) {
   }
 }
 
-if (cepInput) {
-  cepInput.addEventListener("blur", () => {
-    buscarCEP(cepInput.value);
+if (form1Cep) {
+  form1Cep.addEventListener("blur", () => {
+    buscarCEP(form1Cep.value, "f1");
+  });
+}
+
+if (form2Cep) {
+  form2Cep.addEventListener("blur", () => {
+    buscarCEP(form2Cep.value, "f2");
   });
 }
 
@@ -183,89 +227,142 @@ if (addDependenteBtn) {
 }
 
 // ===============================
-// ASSINATURA DIGITAL
+// ASSINATURAS DIGITAIS
 // ===============================
-function initSignaturePad() {
-  if (!canvas) return;
+function createSignaturePad(canvasEl, existingPad) {
+  if (!canvasEl) return null;
 
+  const parentWidth = canvasEl.parentElement.offsetWidth;
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
-  const parentWidth = canvas.parentElement.offsetWidth;
 
-  const previousData =
-    signaturePad && !signaturePad.isEmpty() ? signaturePad.toData() : null;
+  const oldData = existingPad && !existingPad.isEmpty()
+    ? existingPad.toData()
+    : null;
 
-  canvas.width = parentWidth * ratio;
-  canvas.height = 240 * ratio;
-  canvas.style.width = `${parentWidth}px`;
-  canvas.style.height = "240px";
+  canvasEl.width = parentWidth * ratio;
+  canvasEl.height = 240 * ratio;
+  canvasEl.style.width = `${parentWidth}px`;
+  canvasEl.style.height = "240px";
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvasEl.getContext("2d");
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(ratio, ratio);
 
-  signaturePad = new SignaturePad(canvas, {
+  const newPad = new SignaturePad(canvasEl, {
     minWidth: 0.8,
     maxWidth: 2,
     penColor: "#111827",
     backgroundColor: "rgb(255,255,255)",
   });
 
-  if (previousData) {
-    signaturePad.fromData(previousData);
+  if (oldData) {
+    newPad.fromData(oldData);
   }
+
+  return newPad;
 }
 
-initSignaturePad();
-window.addEventListener("resize", initSignaturePad);
+function initAllSignaturePads() {
+  signaturePad1 = createSignaturePad(form1Canvas, signaturePad1);
+  signaturePad2 = createSignaturePad(form2Canvas, signaturePad2);
+}
 
-if (clearSignatureBtn) {
-  clearSignatureBtn.addEventListener("click", () => {
-    if (signaturePad) {
-      signaturePad.clear();
+initAllSignaturePads();
+window.addEventListener("resize", initAllSignaturePads);
+
+clearSignatureButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.target;
+
+    if (target === "1" && signaturePad1) {
+      signaturePad1.clear();
+    }
+
+    if (target === "2" && signaturePad2) {
+      signaturePad2.clear();
     }
   });
+});
+
+// ===============================
+// ALTERNAR FORMULÁRIOS
+// ===============================
+function alternarFormulario() {
+  const isForm1Active = form1.classList.contains("active-form");
+
+  if (isForm1Active) {
+    form1.classList.remove("active-form");
+    form1.classList.add("hidden-form");
+
+    form2.classList.remove("hidden-form");
+    form2.classList.add("active-form");
+  } else {
+    form2.classList.remove("active-form");
+    form2.classList.add("hidden-form");
+
+    form1.classList.remove("hidden-form");
+    form1.classList.add("active-form");
+  }
+
+  setTimeout(() => {
+    initAllSignaturePads();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 50);
 }
+
+toggleButtons.forEach((button) => {
+  button.addEventListener("click", alternarFormulario);
+});
 
 // ===============================
 // PREPARAR FORMULÁRIO PARA CAPTURA
 // ===============================
-function lockFormVisualState() {
-  const elements = formWrapper.querySelectorAll("input, select, textarea");
+function lockFormVisualState(targetForm) {
+  const elements = targetForm.querySelectorAll("input, select, textarea");
 
   elements.forEach((el) => {
+    el.blur();
+    el.setAttribute("value", el.value || "");
+
     if (el.tagName === "SELECT") {
-      const selectedText = el.options[el.selectedIndex]
-        ? el.options[el.selectedIndex].text
-        : "";
-      el.setAttribute("data-html2canvas-value", selectedText);
-    } else {
-      el.setAttribute("data-html2canvas-value", el.value || "");
+      Array.from(el.options).forEach((option) => {
+        option.removeAttribute("selected");
+        if (option.value === el.value) {
+          option.setAttribute("selected", "selected");
+        }
+      });
     }
 
-    el.blur();
+    if (el.type === "checkbox" || el.type === "radio") {
+      if (el.checked) {
+        el.setAttribute("checked", "checked");
+      } else {
+        el.removeAttribute("checked");
+      }
+    }
   });
 }
 
 // ===============================
-// GERAR IMAGEM DO FORMULÁRIO
+// GERAR IMAGEM DO FORMULÁRIO ATIVO
 // ===============================
-async function gerarImagemFormulario() {
-  lockFormVisualState();
+async function gerarImagemFormulario(targetForm, submitButton) {
+  lockFormVisualState(targetForm);
 
-  const originalButtonText = submitBtn ? submitBtn.textContent : "";
-  const originalDisabled = submitBtn ? submitBtn.disabled : false;
+  const originalButtonText = submitButton ? submitButton.textContent : "";
+  const originalDisabled = submitButton ? submitButton.disabled : false;
 
-  if (submitBtn) {
-    submitBtn.textContent = "Gerando imagem...";
-    submitBtn.disabled = true;
+  if (submitButton) {
+    submitButton.textContent = "Gerando imagem...";
+    submitButton.disabled = true;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 250));
 
-  const targetWidth = formWrapper.scrollWidth;
-  const targetHeight = formWrapper.scrollHeight;
+  const targetWidth = targetForm.scrollWidth;
+  const targetHeight = targetForm.scrollHeight;
 
-  const screenshotCanvas = await html2canvas(formWrapper, {
+  const canvasResult = await html2canvas(targetForm, {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
@@ -277,23 +374,24 @@ async function gerarImagemFormulario() {
     scrollY: 0,
   });
 
-  if (submitBtn) {
-    submitBtn.textContent = originalButtonText;
-    submitBtn.disabled = originalDisabled;
+  if (submitButton) {
+    submitButton.textContent = originalButtonText;
+    submitButton.disabled = originalDisabled;
   }
 
-  return screenshotCanvas;
+  return canvasResult;
 }
 
 // ===============================
 // DOWNLOAD DA IMAGEM
 // ===============================
-function downloadCanvasImage(canvasEl) {
-  const nomeInput = document.getElementById("nome");
+function downloadCanvasImage(canvasEl, targetForm) {
+  const nomeInput = targetForm.querySelector('input[name="nome"]');
   const nome = nomeInput ? nomeInput.value.trim() : "";
   const safeName = sanitizeFileName(nome || "formulario");
   const timestamp = getFormattedToday();
-  const fileName = `ficha_${safeName}_${timestamp}.jpg`;
+  const formType = targetForm.id === "cadastroForm1" ? "completo" : "alternativo";
+  const fileName = `ficha_${formType}_${safeName}_${timestamp}.jpg`;
 
   const imageData = canvasEl.toDataURL("image/jpeg", 0.95);
 
@@ -307,46 +405,95 @@ function downloadCanvasImage(canvasEl) {
 }
 
 // ===============================
-// ENVIO = DOWNLOAD
+// SUBMIT FORMULÁRIO 1
 // ===============================
-async function handleSubmit(event) {
+async function handleSubmitForm1(event) {
   event.preventDefault();
 
-  if (!form.checkValidity()) {
-    form.reportValidity();
+  if (!form1.checkValidity()) {
+    form1.reportValidity();
     return;
   }
 
-  if (!signaturePad || signaturePad.isEmpty()) {
+  if (!signaturePad1 || signaturePad1.isEmpty()) {
     alert("Por favor, faça a assinatura digital antes de enviar.");
     return;
   }
 
+  const submitButton = form1.querySelector(".submit-btn");
+
   try {
-    if (submitBtn) {
-      submitBtn.textContent = "Preparando download...";
-      submitBtn.disabled = true;
+    if (submitButton) {
+      submitButton.textContent = "Preparando download...";
+      submitButton.disabled = true;
     }
 
-    form.classList.add("loading");
+    form1.classList.add("loading");
 
-    const canvasResult = await gerarImagemFormulario();
-    downloadCanvasImage(canvasResult);
+    const canvasResult = await gerarImagemFormulario(form1, submitButton);
+    downloadCanvasImage(canvasResult, form1);
 
     alert("Imagem do formulário baixada com sucesso.");
   } catch (error) {
-    console.error("Erro ao gerar imagem do formulário:", error);
+    console.error("Erro ao gerar imagem do formulário 1:", error);
     alert("Não foi possível gerar o download da imagem do formulário.");
   } finally {
-    if (submitBtn) {
-      submitBtn.textContent = "Enviar formulário";
-      submitBtn.disabled = false;
+    if (submitButton) {
+      submitButton.textContent = "Enviar formulário";
+      submitButton.disabled = false;
     }
 
-    form.classList.remove("loading");
+    form1.classList.remove("loading");
   }
 }
 
-if (form) {
-  form.addEventListener("submit", handleSubmit);
+// ===============================
+// SUBMIT FORMULÁRIO 2
+// ===============================
+async function handleSubmitForm2(event) {
+  event.preventDefault();
+
+  if (!form2.checkValidity()) {
+    form2.reportValidity();
+    return;
+  }
+
+  if (!signaturePad2 || signaturePad2.isEmpty()) {
+    alert("Por favor, faça a assinatura digital antes de enviar.");
+    return;
+  }
+
+  const submitButton = form2.querySelector(".submit-btn");
+
+  try {
+    if (submitButton) {
+      submitButton.textContent = "Preparando download...";
+      submitButton.disabled = true;
+    }
+
+    form2.classList.add("loading");
+
+    const canvasResult = await gerarImagemFormulario(form2, submitButton);
+    downloadCanvasImage(canvasResult, form2);
+
+    alert("Imagem do formulário baixada com sucesso.");
+  } catch (error) {
+    console.error("Erro ao gerar imagem do formulário 2:", error);
+    alert("Não foi possível gerar o download da imagem do formulário.");
+  } finally {
+    if (submitButton) {
+      submitButton.textContent = "Enviar formulário";
+      submitButton.disabled = false;
+    }
+
+    form2.classList.remove("loading");
+  }
+}
+
+if (form1) {
+  form1.addEventListener("submit", handleSubmitForm1);
+}
+
+if (form2) {
+  form2.addEventListener("submit", handleSubmitForm2);
 }

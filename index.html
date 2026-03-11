@@ -4,233 +4,350 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Formulário de Cadastro | Clube de Benefícios</title>
+  <title>Formulários de Cadastro | Sindpol & Grupo Blue</title>
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsivo.css">
-  
-  <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
 </head>
 <body>
-  <div class="container" id="form-wrapper">
-    <header class="form-header">
-      <img
-        src="img/logo sindpol.png"
-        alt="Imagem de cabeçalho"
-        class="header-image"
-      />
-      <div class="header-content">
-        <h1>Formulário de Cadastro</h1>
-        <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1><br>
-        <h2>Preencha o formulário com atenção</h2>
-      </div>
-    </header>
-
-    <form id="cadastroForm">
-      <!-- DADOS PESSOAIS -->
-      <section class="form-section">
-        <h2>Dados pessoais</h2>
-
-        <div class="grid">
-          <div class="field full">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required />
+  <div class="container">
+    <div id="form-wrapper">
+      <!-- FORMULÁRIO 1 -->
+      <form id="cadastroForm1" class="form-page active-form">
+        <header class="form-header">
+          <img
+            src="img/logo sindpol.png"
+            alt="Imagem de cabeçalho"
+            class="header-image"
+          />
+          <div class="header-content">
+            <h1>Formulário de Cadastro</h1>
+            <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1><br>
+            <h2>Preencha os dados essenciais abaixo</h2>
           </div>
+        </header>
 
-          <div class="field">
-            <label for="rg">RG:</label>
-            <input type="text" id="rg" name="rg" />
+        <!-- DADOS PESSOAIS -->
+        <section class="form-section">
+          <h2>Dados pessoais</h2>
+
+          <div class="grid">
+            <div class="field full">
+              <label for="f1_nome">Nome:</label>
+              <input type="text" id="f1_nome" name="nome" required />
+            </div>
+
+            <div class="field">
+              <label for="f1_rg">RG:</label>
+              <input type="text" id="f1_rg" name="rg" />
+            </div>
+
+            <div class="field">
+              <label for="f1_cpf">CPF:</label>
+              <input type="text" id="f1_cpf" name="cpf" />
+            </div>
+
+            <div class="field">
+              <label for="f1_matricula">Matrícula Func.:</label>
+              <input type="text" id="f1_matricula" name="matricula" />
+            </div>
+
+            <div class="field">
+              <label for="f1_sexo">Sexo:</label>
+              <select id="f1_sexo" name="sexo" required>
+                <option value="">Selecione</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Masculino">Masculino</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f1_admissao">Data da admissão:</label>
+              <input type="date" id="f1_admissao" name="admissao" />
+            </div>
+
+            <div class="field">
+              <label for="f1_nascimento">Data do nascimento:</label>
+              <input type="date" id="f1_nascimento" name="nascimento" />
+            </div>
+
+            <div class="field">
+              <label for="f1_tipoSanguineo">Tipo sanguíneo:</label>
+              <select id="f1_tipoSanguineo" name="tipoSanguineo">
+                <option value="">Selecione</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+                <option>O+</option>
+                <option>O-</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f1_risp">RISP:</label>
+              <input type="text" id="f1_risp" name="risp" />
+            </div>
           </div>
+        </section>
 
-          <div class="field">
-            <label for="cpf">CPF:</label>
-            <input type="text" id="cpf" name="cpf" />
+        <!-- DADOS PARA CONTATO -->
+        <section class="form-section">
+          <h2>Dados para contato</h2>
+
+          <div class="grid">
+            <div class="field full">
+              <label for="f1_endereco">Endereço:</label>
+              <input type="text" id="f1_endereco" name="endereco" />
+            </div>
+
+            <div class="field">
+              <label for="f1_cep">CEP:</label>
+              <input type="text" id="f1_cep" name="cep" maxlength="9" />
+            </div>
+
+            <div class="field">
+              <label for="f1_bairro">Bairro:</label>
+              <input type="text" id="f1_bairro" name="bairro" />
+            </div>
+
+            <div class="field">
+              <label for="f1_cidade">Cidade:</label>
+              <input type="text" id="f1_cidade" name="cidade" />
+            </div>
+
+            <div class="field">
+              <label for="f1_uf">UF:</label>
+              <input type="text" id="f1_uf" name="uf" maxlength="2" />
+            </div>
+
+            <div class="field">
+              <label for="f1_telefone">Telefone WhatsApp:</label>
+              <input type="text" id="f1_telefone" name="telefone" />
+            </div>
+
+            <div class="field full">
+              <label for="f1_email">E-mail:</label>
+              <input type="email" id="f1_email" name="email" required />
+            </div>
           </div>
+        </section>
 
-          <div class="field">
-            <label for="matricula">Matrícula Func.:</label>
-            <input type="text" id="matricula" name="matricula" />
+        <!-- DADOS COMPLEMENTARES -->
+        <section class="form-section">
+          <h2>Dados Complementares</h2>
+
+          <div class="grid">
+            <div class="field">
+              <label for="f1_estadoCivil">Estado civil:</label>
+              <select id="f1_estadoCivil" name="estadoCivil">
+                <option value="">Selecione</option>
+                <option>Solteiro(a)</option>
+                <option>Casado(a)</option>
+                <option>União Estável</option>
+                <option>Divorciado(a)</option>
+                <option>Viúvo(a)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f1_cargo">Cargo:</label>
+              <input type="text" id="f1_cargo" name="cargo" />
+            </div>
+
+            <div class="field">
+              <label for="f1_lotacao">Lotação:</label>
+              <input type="text" id="f1_lotacao" name="lotacao" />
+            </div>
+
+            <div class="field">
+              <label for="f1_classe">Classe:</label>
+              <input type="text" id="f1_classe" name="classe" />
+            </div>
+
+            <div class="field">
+              <label for="f1_situacaoFuncional">Situação funcional:</label>
+              <select id="f1_situacaoFuncional" name="situacaoFuncional">
+                <option value="">Selecione</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Aposentado">Aposentado</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="f1_nomeMae">Nome da mãe:</label>
+              <input type="text" id="f1_nomeMae" name="nomeMae" />
+            </div>
+
+            <div class="field full">
+              <label for="f1_nomePai">Nome do pai:</label>
+              <input type="text" id="f1_nomePai" name="nomePai" />
+            </div>
           </div>
+        </section>
 
-          <div class="field">
-            <label for="sexo">Sexo:</label>
-            <select id="sexo" name="sexo" required>
-              <option value="">Selecione</option>
-              <option value="Feminino">Feminino</option>
-              <option value="Masculino">Masculino</option>
-            </select>
-          </div>
+        <!-- DEPENDENTES -->
+        <section class="form-section">
+          <h2>Dados dos Beneficiários/Dependentes</h2>
 
-          <div class="field">
-            <label for="admissao">Data da admissão:</label>
-            <input type="date" id="admissao" name="admissao" />
-          </div>
+          <div id="dependentes-container"></div>
 
-          <div class="field">
-            <label for="nascimento">Data do nascimento:</label>
-            <input type="date" id="nascimento" name="nascimento" />
-          </div>
-
-          <div class="field">
-            <label for="tipoSanguineo">Tipo sanguíneo:</label>
-            <select id="tipoSanguineo" name="tipoSanguineo">
-              <option value="">Selecione</option>
-              <option>A+</option>
-              <option>A-</option>
-              <option>B+</option>
-              <option>B-</option>
-              <option>AB+</option>
-              <option>AB-</option>
-              <option>O+</option>
-              <option>O-</option>
-              <option>Não sei</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="risp">RISP:</label>
-            <input type="text" id="risp" name="risp" />
-          </div>
-        </div>
-      </section>
-
-      <!-- DADOS PARA CONTATO -->
-      <section class="form-section">
-        <h2>Dados para contato</h2>
-
-        <div class="grid">
-          <div class="field full">
-            <label for="endereco">Endereço:</label>
-            <input type="text" id="endereco" name="endereco" />
-          </div>
-
-          <div class="field">
-            <label for="cep">CEP:</label>
-            <input type="text" id="cep" name="cep" maxlength="9" />
-          </div>
-
-          <div class="field">
-            <label for="bairro">Bairro:</label>
-            <input type="text" id="bairro" name="bairro" />
-          </div>
-
-          <div class="field">
-            <label for="cidade">Cidade:</label>
-            <input type="text" id="cidade" name="cidade" />
-          </div>
-
-          <div class="field">
-            <label for="uf">UF:</label>
-            <input type="text" id="uf" name="uf" maxlength="2" />
-          </div>
-
-          <div class="field">
-            <label for="telefone">Telefone WhatsApp:</label>
-            <input type="text" id="telefone" name="telefone" />
-          </div>
-
-          <div class="field full">
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-        </div>
-      </section>
-
-      <!-- DADOS COMPLEMENTARES -->
-      <section class="form-section">
-        <h2>Dados Complementares</h2>
-
-        <div class="grid">
-          <div class="field">
-            <label for="estadoCivil">Estado civil:</label>
-            <select id="estadoCivil" name="estadoCivil">
-              <option value="">Selecione</option>
-              <option>Solteiro(a)</option>
-              <option>Casado(a)</option>
-              <option>União Estável</option>
-              <option>Divorciado(a)</option>
-              <option>Viúvo(a)</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="cargo">Cargo:</label>
-            <input type="text" id="cargo" name="cargo" />
-          </div>
-
-          <div class="field">
-            <label for="lotacao">Lotação:</label>
-            <input type="text" id="lotacao" name="lotacao" />
-          </div>
-
-          <div class="field">
-            <label for="classe">Classe:</label>
-            <input type="text" id="classe" name="classe" />
-          </div>
-
-          <div class="field">
-            <label for="situacaoFuncional">Situação funcional:</label>
-            <select id="situacaoFuncional" name="situacaoFuncional">
-              <option value="">Selecione</option>
-              <option value="Ativo">Ativo</option>
-              <option value="Aposentado">Aposentado</option>
-            </select>
-          </div>
-
-          <div class="field full">
-            <label for="nomeMae">Nome da mãe:</label>
-            <input type="text" id="nomeMae" name="nomeMae" />
-          </div>
-
-          <div class="field full">
-            <label for="nomePai">Nome do pai:</label>
-            <input type="text" id="nomePai" name="nomePai" />
-          </div>
-        </div>
-      </section>
-
-      <!-- DEPENDENTES -->
-      <section class="form-section">
-        <h2>Dados dos Beneficiários/Dependentes</h2>
-
-        <div id="dependentes-container"></div>
-
-        <button type="button" class="btn btn-secondary" id="addDependenteBtn">
-          + Adicionar dependente
-        </button>
-      </section>
-
-      <!-- ASSINATURA -->
-      <section class="form-section">
-        <h2>Assinatura digital</h2>
-        <p class="signature-tip">Assine no campo abaixo:</p>
-
-        <div class="signature-box">
-          <canvas id="signature-pad"></canvas>
-        </div>
-
-        <div class="signature-actions">
-          <button type="button" class="btn btn-outline" id="clearSignatureBtn">
-            Limpar assinatura
+          <button type="button" class="btn btn-secondary" id="addDependenteBtn">
+            + Adicionar dependente
           </button>
-        </div>
-      </section>
+        </section>
 
-      <!-- AÇÕES -->
-      <section class="form-actions">
-        <button type="submit" class="btn btn-primary" id="submitBtn">
-          Enviar formulário
-        </button>
-      </section>
-    </form>
+        <!-- ASSINATURA -->
+        <section class="form-section">
+          <h2>Assinatura digital</h2>
+          <p class="signature-tip">Assine no campo abaixo:</p>
+
+          <div class="signature-box">
+            <canvas id="signature-pad-1"></canvas>
+          </div>
+
+          <div class="signature-actions">
+            <button type="button" class="btn btn-outline clear-signature-btn" data-target="1">
+              Limpar assinatura
+            </button>
+          </div>
+        </section>
+
+        <!-- AÇÕES -->
+        <section class="form-actions">
+          <button type="submit" class="btn btn-primary submit-btn">
+            Enviar formulário
+          </button>
+          <button type="button" class="btn btn-outline toggleFormBtn">
+            Alternar Formulário
+          </button>
+        </section>
+      </form>
+
+      <!-- FORMULÁRIO 2 -->
+      <form id="cadastroForm2" class="form-page hidden-form">
+        <header class="form-header">
+          <img
+            src="img/grupo-blue-logo.png"
+            alt="Imagem de cabeçalho"
+            class="header-image"
+          />
+          <div class="header-content">
+            <h1>Ficha de Adesão</h1>
+            <h1>PLANO ODONTOLÓGICO BLUE MASTER</h1><br>
+            <h2>Preencha os dados essenciais abaixo</h2>
+          </div>
+        </header>
+
+        <!-- DADOS PESSOAIS -->
+        <section class="form-section">
+          <h2>Dados pessoais</h2>
+
+          <div class="grid">
+            <div class="field full">
+              <label for="f2_nome">Nome:</label>
+              <input type="text" id="f2_nome" name="nome" required />
+            </div>
+
+            <div class="field">
+              <label for="f2_rg">RG:</label>
+              <input type="text" id="f2_rg" name="rg" />
+            </div>
+
+            <div class="field">
+              <label for="f2_cpf">CPF:</label>
+              <input type="text" id="f2_cpf" name="cpf" />
+            </div>
+
+            <div class="field">
+              <label for="f2_sexo">Sexo:</label>
+              <select id="f2_sexo" name="sexo" required>
+                <option value="">Selecione</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Masculino">Masculino</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f2_nascimento">Data de nascimento:</label>
+              <input type="date" id="f2_nascimento" name="nascimento" />
+            </div>
+
+            <div class="field full">
+              <label for="f2_nomeMae">Nome da mãe:</label>
+              <input type="text" id="f2_nomeMae" name="nomeMae" />
+            </div>
+
+            <div class="field">
+              <label for="f2_cep">CEP:</label>
+              <input type="text" id="f2_cep" name="cep" maxlength="9" />
+            </div>
+
+            <div class="field full">
+              <label for="f2_endereco">Endereço:</label>
+              <input type="text" id="f2_endereco" name="endereco" />
+            </div>
+
+            <div class="field">
+              <label for="f2_bairro">Bairro:</label>
+              <input type="text" id="f2_bairro" name="bairro" />
+            </div>
+
+            <div class="field">
+              <label for="f2_cidade">Cidade:</label>
+              <input type="text" id="f2_cidade" name="cidade" />
+            </div>
+
+            <div class="field">
+              <label for="f2_uf">UF:</label>
+              <input type="text" id="f2_uf" name="uf" maxlength="2" />
+            </div>
+
+            <div class="field">
+              <label for="f2_telefone">Telefone WhatsApp:</label>
+              <input type="text" id="f2_telefone" name="telefone" />
+            </div>
+
+            <div class="field full">
+              <label for="f2_email">E-mail:</label>
+              <input type="email" id="f2_email" name="email" required />
+            </div>
+          </div>
+        </section>
+
+        <!-- ASSINATURA -->
+        <section class="form-section">
+          <h2>Assinatura digital</h2>
+          <p class="signature-tip">Assine no campo abaixo:</p>
+
+          <div class="signature-box">
+            <canvas id="signature-pad-2"></canvas>
+          </div>
+
+          <div class="signature-actions">
+            <button type="button" class="btn btn-outline clear-signature-btn" data-target="2">
+              Limpar assinatura
+            </button>
+          </div>
+        </section>
+
+        <!-- AÇÕES -->
+        <section class="form-actions">
+          <button type="submit" class="btn btn-primary submit-btn">
+            Enviar formulário
+          </button>
+          <button type="button" class="btn btn-outline toggleFormBtn">
+            Alternar Formulário
+          </button>
+        </section>
+      </form>
+    </div>
   </div>
 
-  <!-- LIBS -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
   <script src="js/script.js"></script>
 </body>
 </html>

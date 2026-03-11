@@ -36,6 +36,18 @@ body {
   overflow: hidden;
 }
 
+.form-page {
+  display: block;
+}
+
+.hidden-form {
+  display: none;
+}
+
+.active-form {
+  display: block;
+}
+
 .form-header {
   position: relative;
 }
@@ -52,6 +64,7 @@ body {
   padding: 24px 28px;
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.08));
   border-bottom: 1px solid var(--border);
+  border-radius: 10px;
 }
 
 .header-content h1 {
@@ -66,14 +79,14 @@ body {
 }
 
 form {
-  padding: 28px;
+  padding-bottom: 28px;
 }
 
 .form-section {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 22px;
-  margin-bottom: 22px;
+  margin: 22px 10px 0;
   background: #fff;
 }
 
@@ -114,6 +127,7 @@ textarea {
   outline: none;
   transition: 0.2s ease;
   background: #fff;
+  color: var(--text);
 }
 
 input:focus,
@@ -173,7 +187,9 @@ textarea:focus {
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  gap: 12px;
+  margin: 22px 28px 0;
+  flex-wrap: wrap;
 }
 
 .dependente-card {
@@ -189,6 +205,7 @@ textarea:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+  gap: 12px;
 }
 
 .dependente-title {
@@ -216,7 +233,7 @@ textarea:focus {
   background: #fff;
 }
 
-#signature-pad {
+canvas {
   width: 100%;
   height: 240px;
   display: block;
