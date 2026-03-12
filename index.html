@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Formulários de Cadastro | Sindpol & Grupo Blue</title>
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsivo.css" />
 </head>
-
 <body>
   <div class="container">
     <div id="form-wrapper">
       <!-- FORMULÁRIO 1 -->
       <form id="cadastroForm1" class="form-page active-form">
         <header class="form-header">
-          <img src="img/logo sindpol.png" alt="Imagem de cabeçalho" class="header-image" />
+          <img
+            src="img/logo sindpol.png"
+            alt="Imagem de cabeçalho"
+            class="header-image"
+          />
           <div class="header-content">
             <h1>Formulário de Cadastro</h1>
             <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1>
@@ -217,12 +218,30 @@
             Alternar Formulário
           </button>
         </section>
+
+        <section class="manual-sign-footer form-manual-footer">
+          <div class="manual-sign-item">
+            <div class="manual-sign-line"></div>
+            <div class="manual-sign-label">SINDICALIZADO (A)</div>
+          </div>
+
+          <div class="manual-sign-item">
+            <div class="manual-sign-line"></div>
+            <div class="manual-sign-label">
+              <span class="sind-red">SIND</span><span class="pol-bold">POL</span><span>/PA</span>
+            </div>
+          </div>
+        </section>
       </form>
 
       <!-- FORMULÁRIO 2 -->
       <form id="cadastroForm2" class="form-page hidden-form">
         <header class="form-header">
-          <img src="img/grupo-blue-logo.png" alt="Imagem de cabeçalho" class="header-image" />
+          <img
+            src="img/oralblue-logo.png"
+            alt="Imagem de cabeçalho"
+            class="header-image"
+          />
           <div class="header-content">
             <h1>Ficha de Adesão</h1>
             <h1>PLANO ODONTOLÓGICO BLUE MASTER</h1>
@@ -306,6 +325,95 @@
           </div>
         </section>
 
+        <!-- NOVA SECTION COM IMAGEM HORIZONTAL -->
+        <section class="form-section section-with-banner">
+          <div class="section-banner">
+            <img
+              src="img/maisblue-logo.png"
+              alt="Imagem horizontal da seção adicional"
+              class="section-banner-image"
+            />
+            <div class="section-banner-content">
+              <h1>Ficha de Adesão</h1>
+              <h1>MAIS BLUE CLUBE DE BENEFÍCIOS</h1>
+              <h2>Preencha novamente as informações abaixo</h2>
+            </div>
+          </div>
+
+          <h2>Dados pessoais</h2>
+
+          <div class="grid">
+            <div class="field full">
+              <label for="f2b_nome">Nome:</label>
+              <input type="text" id="f2b_nome" name="nome_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_rg">RG:</label>
+              <input type="text" id="f2b_rg" name="rg_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_cpf">CPF:</label>
+              <input type="text" id="f2b_cpf" name="cpf_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_sexo">Sexo:</label>
+              <select id="f2b_sexo" name="sexo_adicional">
+                <option value="">Selecione</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Masculino">Masculino</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f2b_nascimento">Data de nascimento:</label>
+              <input type="date" id="f2b_nascimento" name="nascimento_adicional" />
+            </div>
+
+            <div class="field full">
+              <label for="f2b_nomeMae">Nome da mãe:</label>
+              <input type="text" id="f2b_nomeMae" name="nomeMae_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_cep">CEP:</label>
+              <input type="text" id="f2b_cep" name="cep_adicional" maxlength="9" />
+            </div>
+
+            <div class="field full">
+              <label for="f2b_endereco">Endereço:</label>
+              <input type="text" id="f2b_endereco" name="endereco_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_bairro">Bairro:</label>
+              <input type="text" id="f2b_bairro" name="bairro_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_cidade">Cidade:</label>
+              <input type="text" id="f2b_cidade" name="cidade_adicional" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_uf">UF:</label>
+              <input type="text" id="f2b_uf" name="uf_adicional" maxlength="2" />
+            </div>
+
+            <div class="field">
+              <label for="f2b_telefone">Telefone WhatsApp:</label>
+              <input type="text" id="f2b_telefone" name="telefone_adicional" />
+            </div>
+
+            <div class="field full">
+              <label for="f2b_email">E-mail:</label>
+              <input type="email" id="f2b_email" name="email_adicional" />
+            </div>
+          </div>
+        </section>
+
         <section class="form-section">
           <h2>Assinatura digital</h2>
           <p class="signature-tip">Assine no campo abaixo:</p>
@@ -329,14 +437,28 @@
             Alternar Formulário
           </button>
         </section>
+
+        <section class="manual-sign-footer form-manual-footer">
+          <div class="manual-sign-item">
+            <div class="manual-sign-line"></div>
+            <div class="manual-sign-label">SINDICALIZADO (A)</div>
+          </div>
+
+          <div class="manual-sign-item">
+            <div class="manual-sign-line"></div>
+            <div class="manual-sign-label">
+              <span class="grupo-bold">GRUPO</span><span class="blue-text"> BLUE</span><span> / PA</span>
+            </div>
+          </div>
+        </section>
       </form>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="js/script.js"></script>
 </body>
-
 </html>

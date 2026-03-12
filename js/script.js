@@ -18,6 +18,10 @@ const form2Cpf = document.getElementById("f2_cpf");
 const form2Cep = document.getElementById("f2_cep");
 const form2Telefone = document.getElementById("f2_telefone");
 
+const form2bCpf = document.getElementById("f2b_cpf");
+const form2bCep = document.getElementById("f2b_cep");
+const form2bTelefone = document.getElementById("f2b_telefone");
+
 const form1Canvas = document.getElementById("signature-pad-1");
 const form2Canvas = document.getElementById("signature-pad-2");
 
@@ -116,35 +120,8 @@ function getActiveSignaturePad(targetForm) {
   return targetForm.id === "cadastroForm1" ? signaturePad1 : signaturePad2;
 }
 
-function getFormTypeLabel(targetForm) {
-  return targetForm.id === "cadastroForm1"
-    ? "Formulário Completo"
-    : "Formulário Alternativo";
-}
-
 function getHeaderImageElement(targetForm) {
   return targetForm.querySelector(".header-image");
-}
-
-function getHeaderTitleText(targetForm) {
-  const titles = [...targetForm.querySelectorAll(".header-content h1")].map(el => el.textContent.trim()).filter(Boolean);
-  return titles.join(" • ");
-}
-
-function getHeaderSubtitleText(targetForm) {
-  const subtitle = targetForm.querySelector(".header-content h2");
-  return subtitle ? subtitle.textContent.trim() : "";
-}
-
-function triggerBlobDownload(blob, fileName) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 async function imageElementToDataURL(imgEl) {
@@ -179,6 +156,17 @@ function getSignatureDataURL(targetForm) {
   const pad = getActiveSignaturePad(targetForm);
   if (!pad || pad.isEmpty()) return null;
   return pad.toDataURL("image/png");
+}
+
+function triggerBlobDownload(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function autoFitColumns(worksheet, minWidth = 14, maxWidth = 45) {
@@ -219,41 +207,29 @@ function applyCellBorder(cell) {
 // ===============================
 // MÁSCARAS
 // ===============================
-if (form1Cpf) {
-  form1Cpf.addEventListener("input", (e) => {
-    e.target.value = formatCPF(e.target.value);
-  });
-}
+[form1Cpf, form2Cpf, form2bCpf].forEach((input) => {
+  if (input) {
+    input.addEventListener("input", (e) => {
+      e.target.value = formatCPF(e.target.value);
+    });
+  }
+});
 
-if (form2Cpf) {
-  form2Cpf.addEventListener("input", (e) => {
-    e.target.value = formatCPF(e.target.value);
-  });
-}
+[form1Cep, form2Cep, form2bCep].forEach((input) => {
+  if (input) {
+    input.addEventListener("input", (e) => {
+      e.target.value = formatCEP(e.target.value);
+    });
+  }
+});
 
-if (form1Cep) {
-  form1Cep.addEventListener("input", (e) => {
-    e.target.value = formatCEP(e.target.value);
-  });
-}
-
-if (form2Cep) {
-  form2Cep.addEventListener("input", (e) => {
-    e.target.value = formatCEP(e.target.value);
-  });
-}
-
-if (form1Telefone) {
-  form1Telefone.addEventListener("input", (e) => {
-    e.target.value = formatPhone(e.target.value);
-  });
-}
-
-if (form2Telefone) {
-  form2Telefone.addEventListener("input", (e) => {
-    e.target.value = formatPhone(e.target.value);
-  });
-}
+[form1Telefone, form2Telefone, form2bTelefone].forEach((input) => {
+  if (input) {
+    input.addEventListener("input", (e) => {
+      e.target.value = formatPhone(e.target.value);
+    });
+  }
+});
 
 // ===============================
 // VIA CEP
@@ -290,20 +266,12 @@ async function buscarCEP(cep, prefix) {
   }
 }
 
-if (form1Cep) {
-  form1Cep.addEventListener("blur", () => {
-    buscarCEP(form1Cep.value, "f1");
-  });
-}
-
-if (form2Cep) {
-  form2Cep.addEventListener("blur", () => {
-    buscarCEP(form2Cep.value, "f2");
-  });
-}
+if (form1Cep) form1Cep.addEventListener("blur", () => buscarCEP(form1Cep.value, "f1"));
+if (form2Cep) form2Cep.addEventListener("blur", () => buscarCEP(form2Cep.value, "f2"));
+if (form2bCep) form2bCep.addEventListener("blur", () => buscarCEP(form2bCep.value, "f2b"));
 
 // ===============================
-// DEPENDENTES DINÂMICOS
+// DEPENDENTES
 // ===============================
 function criarDependenteCard() {
   dependenteIndex += 1;
@@ -339,9 +307,7 @@ function criarDependenteCard() {
   `;
 
   const deleteBtn = card.querySelector(".delete-btn");
-  deleteBtn.addEventListener("click", () => {
-    card.remove();
-  });
+  deleteBtn.addEventListener("click", () => card.remove());
 
   dependentesContainer.appendChild(card);
 }
@@ -369,7 +335,7 @@ function getDependentes() {
 }
 
 // ===============================
-// ASSINATURAS DIGITAIS
+// ASSINATURA
 // ===============================
 function createSignaturePad(canvasEl, existingPad) {
   if (!canvasEl) return null;
@@ -415,19 +381,13 @@ window.addEventListener("resize", initAllSignaturePads);
 clearSignatureButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const target = button.dataset.target;
-
-    if (target === "1" && signaturePad1) {
-      signaturePad1.clear();
-    }
-
-    if (target === "2" && signaturePad2) {
-      signaturePad2.clear();
-    }
+    if (target === "1" && signaturePad1) signaturePad1.clear();
+    if (target === "2" && signaturePad2) signaturePad2.clear();
   });
 });
 
 // ===============================
-// ALTERNAR FORMULÁRIOS
+// ALTERNAR FORM
 // ===============================
 function alternarFormulario() {
   const isForm1Active = form1.classList.contains("active-form");
@@ -435,13 +395,11 @@ function alternarFormulario() {
   if (isForm1Active) {
     form1.classList.remove("active-form");
     form1.classList.add("hidden-form");
-
     form2.classList.remove("hidden-form");
     form2.classList.add("active-form");
   } else {
     form2.classList.remove("active-form");
     form2.classList.add("hidden-form");
-
     form1.classList.remove("hidden-form");
     form1.classList.add("active-form");
   }
@@ -494,7 +452,22 @@ function getFormDataObject(targetForm) {
     };
   }
 
-  return baseData;
+  return {
+    ...baseData,
+    nomeAdicional: formData.get("nome_adicional") || "",
+    rgAdicional: formData.get("rg_adicional") || "",
+    cpfAdicional: formData.get("cpf_adicional") || "",
+    sexoAdicional: formData.get("sexo_adicional") || "",
+    nascimentoAdicional: formatDateBR(formData.get("nascimento_adicional") || ""),
+    nomeMaeAdicional: formData.get("nomeMae_adicional") || "",
+    cepAdicional: formData.get("cep_adicional") || "",
+    enderecoAdicional: formData.get("endereco_adicional") || "",
+    bairroAdicional: formData.get("bairro_adicional") || "",
+    cidadeAdicional: formData.get("cidade_adicional") || "",
+    ufAdicional: formData.get("uf_adicional") || "",
+    telefoneAdicional: formData.get("telefone_adicional") || "",
+    emailAdicional: formData.get("email_adicional") || "",
+  };
 }
 
 function getFieldsForSections(targetForm, data) {
@@ -565,34 +538,51 @@ function getFieldsForSections(targetForm, data) {
         ["E-mail", data.email],
       ],
     },
+    {
+      title: "Dados pessoais adicionais",
+      items: [
+        ["Nome", data.nomeAdicional],
+        ["RG", data.rgAdicional],
+        ["CPF", data.cpfAdicional],
+        ["Sexo", data.sexoAdicional],
+        ["Data do nascimento", data.nascimentoAdicional],
+        ["Nome da mãe", data.nomeMaeAdicional],
+      ],
+    },
+    {
+      title: "Dados para contato adicionais",
+      items: [
+        ["CEP", data.cepAdicional],
+        ["Endereço", data.enderecoAdicional],
+        ["Bairro", data.bairroAdicional],
+        ["Cidade", data.cidadeAdicional],
+        ["UF", data.ufAdicional],
+        ["Telefone WhatsApp", data.telefoneAdicional],
+        ["E-mail", data.emailAdicional],
+      ],
+    },
   ];
 }
 
 // ===============================
-// EXCEL PREMIUM
+// EXCEL
 // ===============================
 async function gerarExcel(targetForm, data) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "ChatGPT";
-  workbook.company = "OpenAI";
   workbook.created = new Date();
   workbook.modified = new Date();
-  workbook.subject = getFormTypeLabel(targetForm);
-  workbook.title = `${getFormTypeLabel(targetForm)} - ${data.nome || "Sem nome"}`;
 
   const logoDataURL = await imageElementToDataURL(getHeaderImageElement(targetForm));
   const signatureDataURL = getSignatureDataURL(targetForm);
 
-  // -------------------------------
-  // ABA PRINCIPAL
-  // -------------------------------
   const ws = workbook.addWorksheet("Cadastro", {
     views: [{ state: "frozen", ySplit: 4 }],
   });
   ws.properties.tabColor = { argb: THEME.blue };
 
   ws.mergeCells("A1:D1");
-  ws.getCell("A1").value = getHeaderTitleText(targetForm) || getFormTypeLabel(targetForm);
+  ws.getCell("A1").value = "CADASTRO";
   ws.getCell("A1").font = { name: "Calibri", size: 16, bold: true, color: { argb: THEME.white } };
   ws.getCell("A1").fill = {
     type: "pattern",
@@ -603,25 +593,29 @@ async function gerarExcel(targetForm, data) {
   ws.getRow(1).height = 28;
 
   ws.mergeCells("A2:D2");
-  ws.getCell("A2").value = getHeaderSubtitleText(targetForm) || "Cadastro gerado automaticamente";
-  ws.getCell("A2").font = { name: "Calibri", size: 11, italic: true, color: { argb: THEME.dark } };
+  ws.getCell("A2").value = `Gerado em ${new Date().toLocaleString("pt-BR")}`;
+  ws.getCell("A2").font = { name: "Calibri", size: 10, color: { argb: THEME.gray } };
   ws.getCell("A2").fill = {
     type: "pattern",
     pattern: "solid",
     fgColor: { argb: THEME.blueSoft },
   };
-  ws.getCell("A2").alignment = { vertical: "middle", horizontal: "left" };
-  ws.getRow(2).height = 22;
 
-  ws.mergeCells("A3:D3");
-  ws.getCell("A3").value = `Gerado em ${new Date().toLocaleString("pt-BR")}`;
-  ws.getCell("A3").font = { name: "Calibri", size: 10, color: { argb: THEME.gray } };
-  ws.getCell("A3").alignment = { vertical: "middle", horizontal: "left" };
-  ws.getRow(3).height = 18;
+  if (logoDataURL) {
+    const logoId = workbook.addImage({
+      base64: logoDataURL,
+      extension: "png",
+    });
+
+    ws.addImage(logoId, {
+      tl: { col: 3.1, row: 0.15 },
+      ext: { width: 150, height: 55 },
+    });
+  }
 
   let currentRow = 5;
-
   const sections = getFieldsForSections(targetForm, data);
+
   sections.forEach((section) => {
     ws.mergeCells(`A${currentRow}:D${currentRow}`);
     const titleCell = ws.getCell(`A${currentRow}`);
@@ -632,8 +626,6 @@ async function gerarExcel(targetForm, data) {
       pattern: "solid",
       fgColor: { argb: THEME.green },
     };
-    titleCell.alignment = { vertical: "middle", horizontal: "left" };
-    ws.getRow(currentRow).height = 20;
     currentRow++;
 
     section.items.forEach(([label, value]) => {
@@ -658,28 +650,12 @@ async function gerarExcel(targetForm, data) {
       applyCellBorder(ws.getCell(`C${currentRow}`));
       applyCellBorder(ws.getCell(`D${currentRow}`));
 
-      ws.getRow(currentRow).height = 20;
       currentRow++;
     });
 
     currentRow++;
   });
 
-  if (logoDataURL) {
-    const logoId = workbook.addImage({
-      base64: logoDataURL,
-      extension: "png",
-    });
-
-    ws.addImage(logoId, {
-      tl: { col: 3.1, row: 0.15 },
-      ext: { width: 150, height: 55 },
-    });
-  }
-
-  // -------------------------------
-  // ABA DEPENDENTES
-  // -------------------------------
   if (targetForm.id === "cadastroForm1") {
     const dependentes = getDependentes();
     const depWs = workbook.addWorksheet("Dependentes", {
@@ -695,15 +671,8 @@ async function gerarExcel(targetForm, data) {
       pattern: "solid",
       fgColor: { argb: THEME.blue },
     };
-    depWs.alignment = { vertical: "middle", horizontal: "left" };
-    depWs.getRow(1).height = 26;
 
-    depWs.mergeCells("A2:D2");
-    depWs.getCell("A2").value = `Titular: ${data.nome || "-"}`;
-    depWs.getCell("A2").font = { italic: true, color: { argb: THEME.gray } };
-    depWs.getRow(2).height = 18;
-
-    const headerRow = depWs.getRow(4);
+    const headerRow = depWs.getRow(3);
     ["#", "Nome", "Parentesco", "Data de nascimento"].forEach((title, index) => {
       const cell = headerRow.getCell(index + 1);
       cell.value = title;
@@ -713,46 +682,28 @@ async function gerarExcel(targetForm, data) {
         pattern: "solid",
         fgColor: { argb: THEME.green },
       };
-      cell.alignment = { vertical: "middle", horizontal: "center" };
       applyCellBorder(cell);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
     });
-    headerRow.height = 22;
 
     if (dependentes.length) {
       dependentes.forEach((dep, index) => {
-        const row = depWs.getRow(5 + index);
+        const row = depWs.getRow(4 + index);
         row.values = [index + 1, dep.nome || "-", dep.parentesco || "-", dep.nascimento || "-"];
-        row.height = 20;
-
         row.eachCell((cell) => {
           applyCellBorder(cell);
           cell.alignment = { vertical: "middle", horizontal: "left", wrapText: true };
         });
-
-        if (index % 2 === 0) {
-          row.eachCell((cell) => {
-            cell.fill = {
-              type: "pattern",
-              pattern: "solid",
-              fgColor: { argb: "F8FAFC" },
-            };
-          });
-        }
       });
     } else {
-      const row = depWs.getRow(5);
+      const row = depWs.getRow(4);
       row.values = ["", "Nenhum dependente informado", "", ""];
-      row.eachCell((cell) => {
-        applyCellBorder(cell);
-      });
+      row.eachCell((cell) => applyCellBorder(cell));
     }
 
     autoFitColumns(depWs, 12, 35);
   }
 
-  // -------------------------------
-  // ABA ASSINATURA
-  // -------------------------------
   const signWs = workbook.addWorksheet("Assinatura");
   signWs.properties.tabColor = { argb: THEME.blueMid };
 
@@ -764,11 +715,6 @@ async function gerarExcel(targetForm, data) {
     pattern: "solid",
     fgColor: { argb: THEME.blue },
   };
-  signWs.getRow(1).height = 26;
-
-  signWs.mergeCells("A2:D2");
-  signWs.getCell("A2").value = `Assinante: ${data.nome || "-"}`;
-  signWs.getCell("A2").font = { italic: true, color: { argb: THEME.gray } };
 
   if (signatureDataURL) {
     const signImageId = workbook.addImage({
@@ -777,14 +723,11 @@ async function gerarExcel(targetForm, data) {
     });
 
     signWs.addImage(signImageId, {
-      tl: { col: 0.3, row: 3 },
+      tl: { col: 0.3, row: 2 },
       ext: { width: 320, height: 120 },
     });
-
-    signWs.getCell("A11").value = "Assinatura capturada no formulário.";
-    signWs.getCell("A11").font = { color: { argb: THEME.gray } };
   } else {
-    signWs.getCell("A4").value = "Assinatura não informada.";
+    signWs.getCell("A3").value = "Assinatura não informada.";
   }
 
   ws.columns = [
@@ -807,189 +750,78 @@ async function gerarExcel(targetForm, data) {
 }
 
 // ===============================
-// PDF PREMIUM
+// PDF COMO PRINT EXATO
 // ===============================
-function addWrappedText(doc, text, x, y, maxWidth, lineHeight = 5) {
-  const lines = doc.splitTextToSize(text, maxWidth);
-  doc.text(lines, x, y);
-  return y + (lines.length * lineHeight);
-}
+function lockFormVisualState(targetForm) {
+  const fields = targetForm.querySelectorAll("input, select, textarea");
 
-function ensurePageSpace(doc, y, required = 18) {
-  const pageHeight = doc.internal.pageSize.getHeight();
-  if (y + required > pageHeight - 15) {
-    doc.addPage();
-    return 20;
-  }
-  return y;
-}
-
-function drawSectionHeader(doc, title, y) {
-  doc.setFillColor(31, 78, 121);
-  doc.roundedRect(12, y - 6, 186, 10, 2, 2, "F");
-
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
-  doc.text(title.toUpperCase(), 16, y);
-  return y + 8;
-}
-
-function drawLabelValue(doc, label, value, y) {
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(31, 41, 55);
-  doc.setFontSize(10);
-  doc.text(`${label}:`, 16, y);
-
-  doc.setFont("helvetica", "normal");
-  const nextY = addWrappedText(doc, value || "-", 52, y, 140, 5);
-  return Math.max(nextY, y + 6);
-}
-
-function drawDependentesTable(doc, dependentes, startY) {
-  let y = startY;
-
-  const colX = [16, 28, 100, 148];
-  const colW = [12, 72, 48, 42];
-  const rowH = 9;
-
-  doc.setFillColor(15, 118, 110);
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.rect(colX[0], y - 6, colW[0], rowH, "F");
-  doc.rect(colX[1], y - 6, colW[1], rowH, "F");
-  doc.rect(colX[2], y - 6, colW[2], rowH, "F");
-  doc.rect(colX[3], y - 6, colW[3], rowH, "F");
-
-  doc.text("#", colX[0] + 4, y);
-  doc.text("Nome", colX[1] + 2, y);
-  doc.text("Parentesco", colX[2] + 2, y);
-  doc.text("Nascimento", colX[3] + 2, y);
-  y += 9;
-
-  doc.setTextColor(31, 41, 55);
-  doc.setFont("helvetica", "normal");
-
-  if (!dependentes.length) {
-    doc.rect(colX[0], y - 6, 174, rowH);
-    doc.text("Nenhum dependente informado.", 18, y);
-    return y + 10;
-  }
-
-  dependentes.forEach((dep, index) => {
-    y = ensurePageSpace(doc, y, 12);
-
-    if (index % 2 === 0) {
-      doc.setFillColor(248, 250, 252);
-      doc.rect(colX[0], y - 6, 174, rowH, "F");
+  fields.forEach((field) => {
+    if (field.tagName === "SELECT") {
+      const selectedValue = field.value;
+      [...field.options].forEach((option) => {
+        option.selected = option.value === selectedValue;
+      });
+    } else if (field.type === "checkbox" || field.type === "radio") {
+      field.defaultChecked = field.checked;
+    } else {
+      field.setAttribute("value", field.value || "");
     }
 
-    doc.setDrawColor(209, 213, 219);
-    doc.rect(colX[0], y - 6, colW[0], rowH);
-    doc.rect(colX[1], y - 6, colW[1], rowH);
-    doc.rect(colX[2], y - 6, colW[2], rowH);
-    doc.rect(colX[3], y - 6, colW[3], rowH);
-
-    doc.text(String(index + 1), colX[0] + 4, y);
-    doc.text((dep.nome || "-").slice(0, 34), colX[1] + 2, y);
-    doc.text((dep.parentesco || "-").slice(0, 20), colX[2] + 2, y);
-    doc.text(dep.nascimento || "-", colX[3] + 2, y);
-
-    y += 9;
+    field.blur();
   });
-
-  return y;
 }
 
-async function gerarPDF(targetForm, data) {
+async function gerarCanvasFormulario(targetForm) {
+  lockFormVisualState(targetForm);
+
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "visible";
+
+  await new Promise((resolve) => setTimeout(resolve, 250));
+
+  const canvas = await html2canvas(targetForm, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    logging: false,
+    scrollX: 0,
+    scrollY: -window.scrollY,
+    windowWidth: document.documentElement.clientWidth,
+    windowHeight: document.documentElement.clientHeight,
+  });
+
+  document.body.style.overflow = previousOverflow;
+  return canvas;
+}
+
+async function gerarPDF(targetForm) {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("p", "mm", "a4");
 
-  const logoDataURL = await imageElementToDataURL(getHeaderImageElement(targetForm));
-  const signatureDataURL = getSignatureDataURL(targetForm);
+  const canvas = await gerarCanvasFormulario(targetForm);
+  const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-  let y = 14;
+  const pdf = new jsPDF("p", "mm", "a4");
 
-  // Cabeçalho premium
-  doc.setFillColor(31, 78, 121);
-  doc.rect(0, 0, 210, 32, "F");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-  if (logoDataURL) {
-    try {
-      doc.addImage(logoDataURL, "PNG", 12, 6, 36, 18);
-    } catch (error) {
-      console.error("Erro ao inserir logo no PDF:", error);
-    }
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+    heightLeft -= pageHeight;
   }
 
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.text(getFormTypeLabel(targetForm), 55, 13);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.text(getHeaderTitleText(targetForm).slice(0, 80), 55, 19);
-  doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, 55, 24);
-
-  y = 40;
-
-  const sections = getFieldsForSections(targetForm, data);
-
-  sections.forEach((section) => {
-    y = ensurePageSpace(doc, y, 18);
-    y = drawSectionHeader(doc, section.title, y);
-
-    section.items.forEach(([label, value]) => {
-      y = ensurePageSpace(doc, y, 12);
-      y = drawLabelValue(doc, label, value, y);
-    });
-
-    y += 3;
-  });
-
-  if (targetForm.id === "cadastroForm1") {
-    const dependentes = getDependentes();
-    y = ensurePageSpace(doc, y, 25);
-    y = drawSectionHeader(doc, "Dependentes", y);
-    y = drawDependentesTable(doc, dependentes, y);
-  }
-
-  y = ensurePageSpace(doc, y, 50);
-  y += 4;
-  y = drawSectionHeader(doc, "Assinatura digital", y);
-
-  if (signatureDataURL) {
-    try {
-      doc.setDrawColor(209, 213, 219);
-      doc.roundedRect(16, y - 2, 78, 34, 2, 2);
-      doc.addImage(signatureDataURL, "PNG", 18, y, 74, 28);
-
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(31, 41, 55);
-      doc.setFontSize(10);
-      doc.text(data.nome || "Assinante", 16, y + 38);
-    } catch (error) {
-      console.error("Erro ao inserir assinatura no PDF:", error);
-      doc.text("Não foi possível renderizar a assinatura.", 16, y + 5);
-    }
-  } else {
-    doc.setTextColor(31, 41, 55);
-    doc.text("Assinatura não informada.", 16, y + 5);
-  }
-
-  // Rodapé
-  const pageCount = doc.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i += 1) {
-    doc.setPage(i);
-    doc.setDrawColor(220, 234, 247);
-    doc.line(12, 287, 198, 287);
-    doc.setFontSize(8);
-    doc.setTextColor(107, 114, 128);
-    doc.text(`Página ${i} de ${pageCount}`, 170, 292);
-  }
-
-  doc.save(`${getBaseFileName(targetForm)}.pdf`);
+  pdf.save(`${getBaseFileName(targetForm)}.pdf`);
 }
 
 // ===============================
@@ -1021,7 +853,7 @@ async function processarEnvio(targetForm) {
     const data = getFormDataObject(targetForm);
 
     await gerarExcel(targetForm, data);
-    await gerarPDF(targetForm, data);
+    await gerarPDF(targetForm);
 
     alert("Planilha Excel e PDF gerados com sucesso.");
   } catch (error) {
@@ -1047,10 +879,5 @@ function handleSubmitForm2(event) {
   processarEnvio(form2);
 }
 
-if (form1) {
-  form1.addEventListener("submit", handleSubmitForm1);
-}
-
-if (form2) {
-  form2.addEventListener("submit", handleSubmitForm2);
-}
+if (form1) form1.addEventListener("submit", handleSubmitForm1);
+if (form2) form2.addEventListener("submit", handleSubmitForm2);

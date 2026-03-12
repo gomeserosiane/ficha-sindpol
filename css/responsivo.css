@@ -32,4 +32,13 @@
     textarea {
         width: 95%;
     }
+
+    .section-inner-header {
+        margin: -18px -18px 18px -18px;
+    }
+
+    .form-manual-footer {
+        padding: 100px 28px 10px;
+        gap: 80px;
+    }
 }
