@@ -38,7 +38,6 @@ const THEME = {
   blueMid: "5B9BD5",
   dark: "1F2937",
   gray: "6B7280",
-  light: "F8FAFC",
   border: "D1D5DB",
   white: "FFFFFF",
   green: "0F766E",
@@ -107,13 +106,13 @@ function sanitizeFileName(value) {
     .toLowerCase();
 }
 
-function getBaseFileName(targetForm) {
+function getBaseFileName(targetForm, extension = "") {
   const nomeInput = targetForm.querySelector('input[name="nome"]');
   const nome = nomeInput ? nomeInput.value.trim() : "";
   const safeName = sanitizeFileName(nome || "formulario");
   const timestamp = getFormattedToday();
   const formType = targetForm.id === "cadastroForm1" ? "completo" : "alternativo";
-  return `ficha_${formType}_${safeName}_${timestamp}`;
+  return `ficha_${formType}_${safeName}_${timestamp}${extension}`;
 }
 
 function getActiveSignaturePad(targetForm) {
@@ -167,6 +166,15 @@ function triggerBlobDownload(blob, fileName) {
   link.click();
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadDataUrl(dataUrl, fileName) {
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function autoFitColumns(worksheet, minWidth = 14, maxWidth = 45) {
@@ -746,11 +754,11 @@ async function gerarExcel(targetForm, data) {
     { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
   );
 
-  triggerBlobDownload(blob, `${getBaseFileName(targetForm)}.xlsx`);
+  triggerBlobDownload(blob, getBaseFileName(targetForm, ".xlsx"));
 }
 
 // ===============================
-// PDF COMO PRINT EXATO
+// PRINT EXATO EM JPG
 // ===============================
 function lockFormVisualState(targetForm) {
   const fields = targetForm.querySelectorAll("input, select, textarea");
@@ -794,34 +802,10 @@ async function gerarCanvasFormulario(targetForm) {
   return canvas;
 }
 
-async function gerarPDF(targetForm) {
-  const { jsPDF } = window.jspdf;
-
+async function gerarJPG(targetForm) {
   const canvas = await gerarCanvasFormulario(targetForm);
-  const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-  const pdf = new jsPDF("p", "mm", "a4");
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
-  const imgWidth = pageWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-  let heightLeft = imgHeight;
-  let position = 0;
-
-  pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
-    heightLeft -= pageHeight;
-  }
-
-  pdf.save(`${getBaseFileName(targetForm)}.pdf`);
+  const imageData = canvas.toDataURL("image/jpeg", 0.95);
+  downloadDataUrl(imageData, getBaseFileName(targetForm, ".jpg"));
 }
 
 // ===============================
@@ -844,7 +828,7 @@ async function processarEnvio(targetForm) {
 
   try {
     if (submitButton) {
-      submitButton.textContent = "Gerando Excel e PDF...";
+      submitButton.textContent = "Gerando Excel e JPG...";
       submitButton.disabled = true;
     }
 
@@ -853,12 +837,12 @@ async function processarEnvio(targetForm) {
     const data = getFormDataObject(targetForm);
 
     await gerarExcel(targetForm, data);
-    await gerarPDF(targetForm);
+    await gerarJPG(targetForm);
 
-    alert("Planilha Excel e PDF gerados com sucesso.");
+    alert("Planilha Excel e imagem JPG geradas com sucesso.");
   } catch (error) {
     console.error("Erro ao gerar arquivos:", error);
-    alert("Não foi possível gerar os arquivos Excel e PDF.");
+    alert("Não foi possível gerar os arquivos Excel e JPG.");
   } finally {
     if (submitButton) {
       submitButton.textContent = "Enviar formulário";
