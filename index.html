@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,457 +9,502 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsivo.css" />
 </head>
+
 <body>
-  <div class="container">
-    <div id="form-wrapper">
-      <!-- FORMULÁRIO 1 -->
-      <form id="cadastroForm1" class="form-page active-form">
-        <header class="form-header">
-          <img
-            src="img/logo sindpol.png"
-            alt="Imagem de cabeçalho"
-            class="header-image"
-          />
-          <div class="header-content">
-            <h1>Formulário de Cadastro</h1>
-            <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1>
-            <br />
-            <h2>Preencha os dados essenciais abaixo</h2>
-          </div>
-        </header>
+  <!-- TELA INICIAL -->
+  <main id="welcome-screen" class="welcome-screen">
+    <section class="welcome-card">
+      <div class="welcome-header">
+        <img src="img/logoinicial.png" alt="Cabeçalho inicial" class="welcome-header-image" />
+      </div>
 
-        <section class="form-section">
-          <h2>Dados pessoais</h2>
+      <div class="welcome-hero">
+        <h1>SEJA BEM-VINDO</h1>
+        <h2>Preencha as fichas à seguir</h2>
+      </div>
 
-          <div class="grid">
-            <div class="field full">
-              <label for="f1_nome">Nome:</label>
-              <input type="text" id="f1_nome" name="nome" required />
-            </div>
+      <section class="welcome-format-section">
+        <h3>Escolha o formato que você deseja preencher as fichas:</h3>
 
-            <div class="field">
-              <label for="f1_rg">RG:</label>
-              <input type="text" id="f1_rg" name="rg" />
-            </div>
-
-            <div class="field">
-              <label for="f1_cpf">CPF:</label>
-              <input type="text" id="f1_cpf" name="cpf" />
-            </div>
-
-            <div class="field">
-              <label for="f1_matricula">Matrícula Func.:</label>
-              <input type="text" id="f1_matricula" name="matricula" />
-            </div>
-
-            <div class="field">
-              <label for="f1_sexo">Sexo:</label>
-              <select id="f1_sexo" name="sexo" required>
-                <option value="">Selecione</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="f1_admissao">Data da admissão:</label>
-              <input type="date" id="f1_admissao" name="admissao" />
-            </div>
-
-            <div class="field">
-              <label for="f1_nascimento">Data do nascimento:</label>
-              <input type="date" id="f1_nascimento" name="nascimento" />
-            </div>
-
-            <div class="field">
-              <label for="f1_tipoSanguineo">Tipo sanguíneo:</label>
-              <select id="f1_tipoSanguineo" name="tipoSanguineo">
-                <option value="">Selecione</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>AB+</option>
-                <option>AB-</option>
-                <option>O+</option>
-                <option>O-</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="f1_risp">RISP:</label>
-              <input type="text" id="f1_risp" name="risp" />
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2>Dados para contato</h2>
-
-          <div class="grid">
-            <div class="field full">
-              <label for="f1_endereco">Endereço:</label>
-              <input type="text" id="f1_endereco" name="endereco" />
-            </div>
-
-            <div class="field">
-              <label for="f1_cep">CEP:</label>
-              <input type="text" id="f1_cep" name="cep" maxlength="9" />
-            </div>
-
-            <div class="field">
-              <label for="f1_bairro">Bairro:</label>
-              <input type="text" id="f1_bairro" name="bairro" />
-            </div>
-
-            <div class="field">
-              <label for="f1_cidade">Cidade:</label>
-              <input type="text" id="f1_cidade" name="cidade" />
-            </div>
-
-            <div class="field">
-              <label for="f1_uf">UF:</label>
-              <input type="text" id="f1_uf" name="uf" maxlength="2" />
-            </div>
-
-            <div class="field">
-              <label for="f1_telefone">Telefone WhatsApp:</label>
-              <input type="text" id="f1_telefone" name="telefone" />
-            </div>
-
-            <div class="field full">
-              <label for="f1_email">E-mail:</label>
-              <input type="email" id="f1_email" name="email" required />
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2>Dados Complementares</h2>
-
-          <div class="grid">
-            <div class="field">
-              <label for="f1_estadoCivil">Estado civil:</label>
-              <select id="f1_estadoCivil" name="estadoCivil">
-                <option value="">Selecione</option>
-                <option>Solteiro(a)</option>
-                <option>Casado(a)</option>
-                <option>União Estável</option>
-                <option>Divorciado(a)</option>
-                <option>Viúvo(a)</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="f1_cargo">Cargo:</label>
-              <input type="text" id="f1_cargo" name="cargo" />
-            </div>
-
-            <div class="field">
-              <label for="f1_lotacao">Lotação:</label>
-              <input type="text" id="f1_lotacao" name="lotacao" />
-            </div>
-
-            <div class="field">
-              <label for="f1_classe">Classe:</label>
-              <input type="text" id="f1_classe" name="classe" />
-            </div>
-
-            <div class="field">
-              <label for="f1_situacaoFuncional">Situação funcional:</label>
-              <select id="f1_situacaoFuncional" name="situacaoFuncional">
-                <option value="">Selecione</option>
-                <option value="Ativo">Ativo</option>
-                <option value="Aposentado">Aposentado</option>
-              </select>
-            </div>
-
-            <div class="field full">
-              <label for="f1_nomeMae">Nome da mãe:</label>
-              <input type="text" id="f1_nomeMae" name="nomeMae" />
-            </div>
-
-            <div class="field full">
-              <label for="f1_nomePai">Nome do pai:</label>
-              <input type="text" id="f1_nomePai" name="nomePai" />
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2>Dados dos Beneficiários/Dependentes</h2>
-
-          <div id="dependentes-container"></div>
-
-          <button type="button" class="btn btn-secondary" id="addDependenteBtn">
-            + Adicionar dependente
+        <div class="format-option">
+          <h3>Formato digital</h3>
+          <p>
+            Nesse formato, você irá preencher as fichas online, e ao finalizar
+            cada uma você deverá enviar os documentos que serão baixados
+            automaticamente em seu dispositivo.
+          </p>
+          <p>
+            IMPORTANTE: Ao finalizar uma ficha, clique no botão "Enviar
+            formulário", baixe os arquivos e envie eles ao seu corretor, antes
+            de apertar em "Alternar formulário".
+          </p>
+          <button type="button" id="digitalModeBtn" class="btn btn-primary">
+            Formato DIGITAL
           </button>
-        </section>
+        </div>
 
-        <section class="form-section">
-          <h2>Assinatura digital</h2>
-          <p class="signature-tip">Assine no campo abaixo:</p>
+        <div class="format-option">
+          <h3>Formato manual</h3>
+          <p>
+            Nesse formato, você deverá baixar a ficha, preenche-la corretamente
+            e entregar presencialmente ao seu corretor, para dar sequência no
+            processo de adesão.
+          </p>
+          <button type="button" id="manualModeBtn" class="btn btn-manual">
+            Formato MANUAL
+          </button>
+        </div>
+      </section>
+    </section>
+  </main>
 
-          <div class="signature-box">
-            <canvas id="signature-pad-1"></canvas>
-          </div>
+  <!-- ÁREA DOS FORMULÁRIOS -->
+  <div id="digital-forms-area" class="digital-forms-area hidden-area">
+    <div class="container">
+      <div class="digital-topbar">
+        <button type="button" id="backToHomeBtn" class="btn btn-outline">
+          Voltar à tela inicial
+        </button>
+      </div>
 
-          <div class="signature-actions">
-            <button type="button" class="btn btn-outline clear-signature-btn" data-target="1">
-              Limpar assinatura
+      <div id="form-wrapper">
+        <!-- FORMULÁRIO 1 -->
+        <form id="cadastroForm1" class="form-page active-form">
+          <header class="form-header">
+            <img src="img/logo sindpol.png" alt="Imagem de cabeçalho" class="header-image" />
+            <div class="header-content">
+              <h1>Formulário de Cadastro</h1>
+              <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1>
+              <br />
+              <h2>Preencha os dados essenciais abaixo</h2>
+            </div>
+          </header>
+
+          <section class="form-section">
+            <h2>Dados pessoais</h2>
+
+            <div class="grid">
+              <div class="field full">
+                <label for="f1_nome">Nome:</label>
+                <input type="text" id="f1_nome" name="nome" required />
+              </div>
+
+              <div class="field">
+                <label for="f1_rg">RG:</label>
+                <input type="text" id="f1_rg" name="rg" />
+              </div>
+
+              <div class="field">
+                <label for="f1_cpf">CPF:</label>
+                <input type="text" id="f1_cpf" name="cpf" />
+              </div>
+
+              <div class="field">
+                <label for="f1_matricula">Matrícula Func.:</label>
+                <input type="text" id="f1_matricula" name="matricula" />
+              </div>
+
+              <div class="field">
+                <label for="f1_sexo">Sexo:</label>
+                <select id="f1_sexo" name="sexo" required>
+                  <option value="">Selecione</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f1_admissao">Data da admissão:</label>
+                <input type="date" id="f1_admissao" name="admissao" />
+              </div>
+
+              <div class="field">
+                <label for="f1_nascimento">Data do nascimento:</label>
+                <input type="date" id="f1_nascimento" name="nascimento" />
+              </div>
+
+              <div class="field">
+                <label for="f1_tipoSanguineo">Tipo sanguíneo:</label>
+                <select id="f1_tipoSanguineo" name="tipoSanguineo">
+                  <option value="">Selecione</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>AB+</option>
+                  <option>AB-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f1_risp">RISP:</label>
+                <input type="text" id="f1_risp" name="risp" />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h2>Dados para contato</h2>
+
+            <div class="grid">
+              <div class="field full">
+                <label for="f1_endereco">Endereço:</label>
+                <input type="text" id="f1_endereco" name="endereco" />
+              </div>
+
+              <div class="field">
+                <label for="f1_cep">CEP:</label>
+                <input type="text" id="f1_cep" name="cep" maxlength="9" />
+              </div>
+
+              <div class="field">
+                <label for="f1_bairro">Bairro:</label>
+                <input type="text" id="f1_bairro" name="bairro" />
+              </div>
+
+              <div class="field">
+                <label for="f1_cidade">Cidade:</label>
+                <input type="text" id="f1_cidade" name="cidade" />
+              </div>
+
+              <div class="field">
+                <label for="f1_uf">UF:</label>
+                <input type="text" id="f1_uf" name="uf" maxlength="2" />
+              </div>
+
+              <div class="field">
+                <label for="f1_telefone">Telefone WhatsApp:</label>
+                <input type="text" id="f1_telefone" name="telefone" />
+              </div>
+
+              <div class="field full">
+                <label for="f1_email">E-mail:</label>
+                <input type="email" id="f1_email" name="email" required />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h2>Dados Complementares</h2>
+
+            <div class="grid">
+              <div class="field">
+                <label for="f1_estadoCivil">Estado civil:</label>
+                <select id="f1_estadoCivil" name="estadoCivil">
+                  <option value="">Selecione</option>
+                  <option>Solteiro(a)</option>
+                  <option>Casado(a)</option>
+                  <option>União Estável</option>
+                  <option>Divorciado(a)</option>
+                  <option>Viúvo(a)</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f1_cargo">Cargo:</label>
+                <input type="text" id="f1_cargo" name="cargo" />
+              </div>
+
+              <div class="field">
+                <label for="f1_lotacao">Lotação:</label>
+                <input type="text" id="f1_lotacao" name="lotacao" />
+              </div>
+
+              <div class="field">
+                <label for="f1_classe">Classe:</label>
+                <input type="text" id="f1_classe" name="classe" />
+              </div>
+
+              <div class="field">
+                <label for="f1_situacaoFuncional">Situação funcional:</label>
+                <select id="f1_situacaoFuncional" name="situacaoFuncional">
+                  <option value="">Selecione</option>
+                  <option value="Ativo">Ativo</option>
+                  <option value="Aposentado">Aposentado</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label for="f1_nomeMae">Nome da mãe:</label>
+                <input type="text" id="f1_nomeMae" name="nomeMae" />
+              </div>
+
+              <div class="field full">
+                <label for="f1_nomePai">Nome do pai:</label>
+                <input type="text" id="f1_nomePai" name="nomePai" />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h2>Dados dos Beneficiários/Dependentes</h2>
+            <div id="dependentes-container"></div>
+
+            <button type="button" class="btn btn-secondary" id="addDependenteBtn">
+              + Adicionar dependente
             </button>
-          </div>
-        </section>
+          </section>
 
-        <section class="form-actions">
-          <button type="submit" class="btn btn-primary submit-btn">
-            Enviar formulário
-          </button>
-          <button type="button" class="btn btn-alternar toggleFormBtn">
-            Alternar Formulário
-          </button>
-        </section>
+          <section class="form-section">
+            <h2>Assinatura digital</h2>
+            <p class="signature-tip">Assine no campo abaixo:</p>
 
-        <section class="manual-sign-footer form-manual-footer">
-          <div class="manual-sign-item">
-            <div class="manual-sign-line"></div>
-            <div class="manual-sign-label">SINDICALIZADO (A)</div>
-          </div>
-
-          <div class="manual-sign-item">
-            <div class="manual-sign-line"></div>
-            <div class="manual-sign-label">
-              <span class="sind-red">SIND</span><span class="pol-bold">POL</span><span>/PA</span>
-            </div>
-          </div>
-        </section>
-      </form>
-
-      <!-- FORMULÁRIO 2 -->
-      <form id="cadastroForm2" class="form-page hidden-form">
-        <header class="form-header">
-          <img
-            src="img/oralblue-logo.png"
-            alt="Imagem de cabeçalho"
-            class="header-image"
-          />
-          <div class="header-content">
-            <h1>Ficha de Adesão</h1>
-            <h1>PLANO ODONTOLÓGICO BLUE MASTER</h1>
-            <br />
-            <h2>Preencha os dados essenciais abaixo</h2>
-          </div>
-        </header>
-
-        <section class="form-section">
-          <h2>Dados pessoais</h2>
-
-          <div class="grid">
-            <div class="field full">
-              <label for="f2_nome">Nome:</label>
-              <input type="text" id="f2_nome" name="nome" required />
+            <div class="signature-box">
+              <canvas id="signature-pad-1"></canvas>
             </div>
 
-            <div class="field">
-              <label for="f2_rg">RG:</label>
-              <input type="text" id="f2_rg" name="rg" />
+            <div class="signature-actions">
+              <button type="button" class="btn btn-outline clear-signature-btn" data-target="1">
+                Limpar assinatura
+              </button>
+            </div>
+          </section>
+
+          <section class="form-actions">
+            <button type="submit" class="btn btn-primary submit-btn">
+              Enviar formulário
+            </button>
+            <button type="button" class="btn btn-alternar toggleFormBtn">
+              Alternar Formulário
+            </button>
+          </section>
+
+          <section class="manual-sign-footer form-manual-footer">
+            <div class="manual-sign-item">
+              <div class="manual-sign-line"></div>
+              <div class="manual-sign-label">SINDICALIZADO (A)</div>
             </div>
 
-            <div class="field">
-              <label for="f2_cpf">CPF:</label>
-              <input type="text" id="f2_cpf" name="cpf" />
+            <div class="manual-sign-item">
+              <div class="manual-sign-line"></div>
+              <div class="manual-sign-label">
+                <span class="sind-red">SIND</span><span class="pol-bold">POL</span><span>/PA</span>
+              </div>
             </div>
+          </section>
+        </form>
 
-            <div class="field">
-              <label for="f2_sexo">Sexo:</label>
-              <select id="f2_sexo" name="sexo" required>
-                <option value="">Selecione</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="f2_nascimento">Data de nascimento:</label>
-              <input type="date" id="f2_nascimento" name="nascimento" />
-            </div>
-
-            <div class="field full">
-              <label for="f2_nomeMae">Nome da mãe:</label>
-              <input type="text" id="f2_nomeMae" name="nomeMae" />
-            </div>
-
-            <div class="field">
-              <label for="f2_cep">CEP:</label>
-              <input type="text" id="f2_cep" name="cep" maxlength="9" />
-            </div>
-
-            <div class="field full">
-              <label for="f2_endereco">Endereço:</label>
-              <input type="text" id="f2_endereco" name="endereco" />
-            </div>
-
-            <div class="field">
-              <label for="f2_bairro">Bairro:</label>
-              <input type="text" id="f2_bairro" name="bairro" />
-            </div>
-
-            <div class="field">
-              <label for="f2_cidade">Cidade:</label>
-              <input type="text" id="f2_cidade" name="cidade" />
-            </div>
-
-            <div class="field">
-              <label for="f2_uf">UF:</label>
-              <input type="text" id="f2_uf" name="uf" maxlength="2" />
-            </div>
-
-            <div class="field">
-              <label for="f2_telefone">Telefone WhatsApp:</label>
-              <input type="text" id="f2_telefone" name="telefone" />
-            </div>
-
-            <div class="field full">
-              <label for="f2_email">E-mail:</label>
-              <input type="email" id="f2_email" name="email" required />
-            </div>
-          </div>
-        </section>
-
-        <!-- NOVA SECTION COM IMAGEM HORIZONTAL -->
-        <section class="form-section section-with-banner">
-          <div class="section-banner">
-            <img
-              src="img/maisblue-logo.png"
-              alt="Imagem horizontal da seção adicional"
-              class="section-banner-image"
-            />
-            <div class="section-banner-content">
+        <!-- FORMULÁRIO 2 -->
+        <form id="cadastroForm2" class="form-page hidden-form">
+          <header class="form-header">
+            <img src="img/oralblue-logo.png" alt="Imagem de cabeçalho" class="header-image" />
+            <div class="header-content">
               <h1>Ficha de Adesão</h1>
-              <h1>MAIS BLUE CLUBE DE BENEFÍCIOS</h1>
-              <h2>Preencha novamente as informações abaixo</h2>
+              <h1>PLANO ODONTOLÓGICO BLUE MASTER</h1>
+              <br />
+              <h2>Preencha os dados essenciais abaixo</h2>
             </div>
-          </div>
+          </header>
 
-          <h2>Dados pessoais</h2>
+          <section class="form-section">
+            <h2>Dados pessoais</h2>
 
-          <div class="grid">
-            <div class="field full">
-              <label for="f2b_nome">Nome:</label>
-              <input type="text" id="f2b_nome" name="nome_adicional" />
+            <div class="grid">
+              <div class="field full">
+                <label for="f2_nome">Nome:</label>
+                <input type="text" id="f2_nome" name="nome" required />
+              </div>
+
+              <div class="field">
+                <label for="f2_rg">RG:</label>
+                <input type="text" id="f2_rg" name="rg" />
+              </div>
+
+              <div class="field">
+                <label for="f2_cpf">CPF:</label>
+                <input type="text" id="f2_cpf" name="cpf" />
+              </div>
+
+              <div class="field">
+                <label for="f2_sexo">Sexo:</label>
+                <select id="f2_sexo" name="sexo" required>
+                  <option value="">Selecione</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f2_nascimento">Data de nascimento:</label>
+                <input type="date" id="f2_nascimento" name="nascimento" />
+              </div>
+
+              <div class="field full">
+                <label for="f2_nomeMae">Nome da mãe:</label>
+                <input type="text" id="f2_nomeMae" name="nomeMae" />
+              </div>
+
+              <div class="field">
+                <label for="f2_cep">CEP:</label>
+                <input type="text" id="f2_cep" name="cep" maxlength="9" />
+              </div>
+
+              <div class="field full">
+                <label for="f2_endereco">Endereço:</label>
+                <input type="text" id="f2_endereco" name="endereco" />
+              </div>
+
+              <div class="field">
+                <label for="f2_bairro">Bairro:</label>
+                <input type="text" id="f2_bairro" name="bairro" />
+              </div>
+
+              <div class="field">
+                <label for="f2_cidade">Cidade:</label>
+                <input type="text" id="f2_cidade" name="cidade" />
+              </div>
+
+              <div class="field">
+                <label for="f2_uf">UF:</label>
+                <input type="text" id="f2_uf" name="uf" maxlength="2" />
+              </div>
+
+              <div class="field">
+                <label for="f2_telefone">Telefone WhatsApp:</label>
+                <input type="text" id="f2_telefone" name="telefone" />
+              </div>
+
+              <div class="field full">
+                <label for="f2_email">E-mail:</label>
+                <input type="email" id="f2_email" name="email" required />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section section-with-banner">
+            <div class="section-banner">
+              <img src="img/maisblue-logo.png" alt="Imagem horizontal da seção adicional"
+                class="section-banner-image" />
+              <div class="section-banner-content">
+                <h1>Formulário de Cadastro</h1>
+                <h1>CLUBE DE BENEFÍCIOS PLANOS DE SAÚDE</h1>
+                <br />
+                <h2>Preencha novamente as informações abaixo</h2>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="f2b_rg">RG:</label>
-              <input type="text" id="f2b_rg" name="rg_adicional" />
+            <h2>Dados pessoais</h2>
+
+            <div class="grid">
+              <div class="field full">
+                <label for="f2b_nome">Nome:</label>
+                <input type="text" id="f2b_nome" name="nome_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_rg">RG:</label>
+                <input type="text" id="f2b_rg" name="rg_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_cpf">CPF:</label>
+                <input type="text" id="f2b_cpf" name="cpf_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_sexo">Sexo:</label>
+                <select id="f2b_sexo" name="sexo_adicional">
+                  <option value="">Selecione</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f2b_nascimento">Data de nascimento:</label>
+                <input type="date" id="f2b_nascimento" name="nascimento_adicional" />
+              </div>
+
+              <div class="field full">
+                <label for="f2b_nomeMae">Nome da mãe:</label>
+                <input type="text" id="f2b_nomeMae" name="nomeMae_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_cep">CEP:</label>
+                <input type="text" id="f2b_cep" name="cep_adicional" maxlength="9" />
+              </div>
+
+              <div class="field full">
+                <label for="f2b_endereco">Endereço:</label>
+                <input type="text" id="f2b_endereco" name="endereco_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_bairro">Bairro:</label>
+                <input type="text" id="f2b_bairro" name="bairro_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_cidade">Cidade:</label>
+                <input type="text" id="f2b_cidade" name="cidade_adicional" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_uf">UF:</label>
+                <input type="text" id="f2b_uf" name="uf_adicional" maxlength="2" />
+              </div>
+
+              <div class="field">
+                <label for="f2b_telefone">Telefone WhatsApp:</label>
+                <input type="text" id="f2b_telefone" name="telefone_adicional" />
+              </div>
+
+              <div class="field full">
+                <label for="f2b_email">E-mail:</label>
+                <input type="email" id="f2b_email" name="email_adicional" />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h2>Assinatura digital</h2>
+            <p class="signature-tip">Assine no campo abaixo:</p>
+
+            <div class="signature-box">
+              <canvas id="signature-pad-2"></canvas>
             </div>
 
-            <div class="field">
-              <label for="f2b_cpf">CPF:</label>
-              <input type="text" id="f2b_cpf" name="cpf_adicional" />
+            <div class="signature-actions">
+              <button type="button" class="btn btn-outline clear-signature-btn" data-target="2">
+                Limpar assinatura
+              </button>
             </div>
+          </section>
 
-            <div class="field">
-              <label for="f2b_sexo">Sexo:</label>
-              <select id="f2b_sexo" name="sexo_adicional">
-                <option value="">Selecione</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="f2b_nascimento">Data de nascimento:</label>
-              <input type="date" id="f2b_nascimento" name="nascimento_adicional" />
-            </div>
-
-            <div class="field full">
-              <label for="f2b_nomeMae">Nome da mãe:</label>
-              <input type="text" id="f2b_nomeMae" name="nomeMae_adicional" />
-            </div>
-
-            <div class="field">
-              <label for="f2b_cep">CEP:</label>
-              <input type="text" id="f2b_cep" name="cep_adicional" maxlength="9" />
-            </div>
-
-            <div class="field full">
-              <label for="f2b_endereco">Endereço:</label>
-              <input type="text" id="f2b_endereco" name="endereco_adicional" />
-            </div>
-
-            <div class="field">
-              <label for="f2b_bairro">Bairro:</label>
-              <input type="text" id="f2b_bairro" name="bairro_adicional" />
-            </div>
-
-            <div class="field">
-              <label for="f2b_cidade">Cidade:</label>
-              <input type="text" id="f2b_cidade" name="cidade_adicional" />
-            </div>
-
-            <div class="field">
-              <label for="f2b_uf">UF:</label>
-              <input type="text" id="f2b_uf" name="uf_adicional" maxlength="2" />
-            </div>
-
-            <div class="field">
-              <label for="f2b_telefone">Telefone WhatsApp:</label>
-              <input type="text" id="f2b_telefone" name="telefone_adicional" />
-            </div>
-
-            <div class="field full">
-              <label for="f2b_email">E-mail:</label>
-              <input type="email" id="f2b_email" name="email_adicional" />
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2>Assinatura digital</h2>
-          <p class="signature-tip">Assine no campo abaixo:</p>
-
-          <div class="signature-box">
-            <canvas id="signature-pad-2"></canvas>
-          </div>
-
-          <div class="signature-actions">
-            <button type="button" class="btn btn-outline clear-signature-btn" data-target="2">
-              Limpar assinatura
+          <section class="form-actions">
+            <button type="submit" class="btn btn-primary submit-btn">
+              Enviar formulário
             </button>
-          </div>
-        </section>
+            <button type="button" class="btn btn-alternar toggleFormBtn">
+              Alternar Formulário
+            </button>
+          </section>
 
-        <section class="form-actions">
-          <button type="submit" class="btn btn-primary submit-btn">
-            Enviar formulário
-          </button>
-          <button type="button" class="btn btn-alternar toggleFormBtn">
-            Alternar Formulário
-          </button>
-        </section>
-
-        <section class="manual-sign-footer form-manual-footer">
-          <div class="manual-sign-item">
-            <div class="manual-sign-line"></div>
-            <div class="manual-sign-label">SINDICALIZADO (A)</div>
-          </div>
-
-          <div class="manual-sign-item">
-            <div class="manual-sign-line"></div>
-            <div class="manual-sign-label">
-              <span class="grupo-bold">GRUPO</span><span class="blue-text"> BLUE</span><span> / PA</span>
+          <section class="manual-sign-footer form-manual-footer">
+            <div class="manual-sign-item">
+              <div class="manual-sign-line"></div>
+              <div class="manual-sign-label">SINDICALIZADO (A)</div>
             </div>
-          </div>
-        </section>
-      </form>
+
+            <div class="manual-sign-item">
+              <div class="manual-sign-line"></div>
+              <div class="manual-sign-label">
+                <span class="grupo-bold">GRUPO</span><span class="blue-text"> BLUE</span><span> / PA</span>
+              </div>
+            </div>
+          </section>
+        </form>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="js/script.js"></script>
 </body>
+
 </html>

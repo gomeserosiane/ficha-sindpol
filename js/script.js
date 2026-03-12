@@ -4,6 +4,12 @@
 const form1 = document.getElementById("cadastroForm1");
 const form2 = document.getElementById("cadastroForm2");
 
+const welcomeScreen = document.getElementById("welcome-screen");
+const digitalFormsArea = document.getElementById("digital-forms-area");
+const digitalModeBtn = document.getElementById("digitalModeBtn");
+const manualModeBtn = document.getElementById("manualModeBtn");
+const backToHomeBtn = document.getElementById("backToHomeBtn");
+
 const dependentesContainer = document.getElementById("dependentes-container");
 const addDependenteBtn = document.getElementById("addDependenteBtn");
 
@@ -42,6 +48,72 @@ const THEME = {
   white: "FFFFFF",
   green: "0F766E",
 };
+
+// ===============================
+// TELA INICIAL / MODOS
+// ===============================
+function abrirModoDigital() {
+  if (welcomeScreen) {
+    welcomeScreen.style.display = "none";
+    welcomeScreen.classList.add("hidden-area");
+  }
+
+  if (digitalFormsArea) {
+    digitalFormsArea.classList.remove("hidden-area");
+    digitalFormsArea.style.display = "block";
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  setTimeout(() => {
+    initAllSignaturePads();
+  }, 100);
+}
+
+function baixarPDFManual() {
+  const link = document.createElement("a");
+  link.href = "docs/ficha-manual.pdf";
+  link.download = "ficha-manual1.pdf", "ficha-manual2";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function voltarTelaInicial() {
+  if (digitalFormsArea) {
+    digitalFormsArea.style.display = "none";
+    digitalFormsArea.classList.add("hidden-area");
+  }
+
+  if (welcomeScreen) {
+    welcomeScreen.classList.remove("hidden-area");
+    welcomeScreen.style.display = "flex";
+  }
+
+  if (form1) {
+    form1.classList.add("active-form");
+    form1.classList.remove("hidden-form");
+  }
+
+  if (form2) {
+    form2.classList.add("hidden-form");
+    form2.classList.remove("active-form");
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+if (digitalModeBtn) {
+  digitalModeBtn.addEventListener("click", abrirModoDigital);
+}
+
+if (manualModeBtn) {
+  manualModeBtn.addEventListener("click", baixarPDFManual);
+}
+
+if (backToHomeBtn) {
+  backToHomeBtn.addEventListener("click", voltarTelaInicial);
+}
 
 // ===============================
 // FUNÇÕES AUXILIARES
@@ -133,6 +205,7 @@ async function imageElementToDataURL(imgEl) {
   return new Promise((resolve) => {
     const image = new Image();
     image.crossOrigin = "anonymous";
+
     image.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -146,6 +219,7 @@ async function imageElementToDataURL(imgEl) {
         resolve(null);
       }
     };
+
     image.onerror = () => resolve(null);
     image.src = imgEl.src;
   });
@@ -165,6 +239,7 @@ function triggerBlobDownload(blob, fileName) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
@@ -274,9 +349,17 @@ async function buscarCEP(cep, prefix) {
   }
 }
 
-if (form1Cep) form1Cep.addEventListener("blur", () => buscarCEP(form1Cep.value, "f1"));
-if (form2Cep) form2Cep.addEventListener("blur", () => buscarCEP(form2Cep.value, "f2"));
-if (form2bCep) form2bCep.addEventListener("blur", () => buscarCEP(form2bCep.value, "f2b"));
+if (form1Cep) {
+  form1Cep.addEventListener("blur", () => buscarCEP(form1Cep.value, "f1"));
+}
+
+if (form2Cep) {
+  form2Cep.addEventListener("blur", () => buscarCEP(form2Cep.value, "f2"));
+}
+
+if (form2bCep) {
+  form2bCep.addEventListener("blur", () => buscarCEP(form2bCep.value, "f2b"));
+}
 
 // ===============================
 // DEPENDENTES
@@ -317,7 +400,9 @@ function criarDependenteCard() {
   const deleteBtn = card.querySelector(".delete-btn");
   deleteBtn.addEventListener("click", () => card.remove());
 
-  dependentesContainer.appendChild(card);
+  if (dependentesContainer) {
+    dependentesContainer.appendChild(card);
+  }
 }
 
 if (addDependenteBtn) {
@@ -389,8 +474,14 @@ window.addEventListener("resize", initAllSignaturePads);
 clearSignatureButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const target = button.dataset.target;
-    if (target === "1" && signaturePad1) signaturePad1.clear();
-    if (target === "2" && signaturePad2) signaturePad2.clear();
+
+    if (target === "1" && signaturePad1) {
+      signaturePad1.clear();
+    }
+
+    if (target === "2" && signaturePad2) {
+      signaturePad2.clear();
+    }
   });
 });
 
@@ -398,16 +489,18 @@ clearSignatureButtons.forEach((button) => {
 // ALTERNAR FORM
 // ===============================
 function alternarFormulario() {
-  const isForm1Active = form1.classList.contains("active-form");
+  const isForm1Active = form1 && form1.classList.contains("active-form");
 
   if (isForm1Active) {
     form1.classList.remove("active-form");
     form1.classList.add("hidden-form");
+
     form2.classList.remove("hidden-form");
     form2.classList.add("active-form");
   } else {
     form2.classList.remove("active-form");
     form2.classList.add("hidden-form");
+
     form1.classList.remove("hidden-form");
     form1.classList.add("active-form");
   }
@@ -591,7 +684,12 @@ async function gerarExcel(targetForm, data) {
 
   ws.mergeCells("A1:D1");
   ws.getCell("A1").value = "CADASTRO";
-  ws.getCell("A1").font = { name: "Calibri", size: 16, bold: true, color: { argb: THEME.white } };
+  ws.getCell("A1").font = {
+    name: "Calibri",
+    size: 16,
+    bold: true,
+    color: { argb: THEME.white },
+  };
   ws.getCell("A1").fill = {
     type: "pattern",
     pattern: "solid",
@@ -673,7 +771,12 @@ async function gerarExcel(targetForm, data) {
 
     depWs.mergeCells("A1:D1");
     depWs.getCell("A1").value = "DEPENDENTES";
-    depWs.getCell("A1").font = { name: "Calibri", size: 15, bold: true, color: { argb: THEME.white } };
+    depWs.getCell("A1").font = {
+      name: "Calibri",
+      size: 15,
+      bold: true,
+      color: { argb: THEME.white },
+    };
     depWs.getCell("A1").fill = {
       type: "pattern",
       pattern: "solid",
@@ -863,5 +966,10 @@ function handleSubmitForm2(event) {
   processarEnvio(form2);
 }
 
-if (form1) form1.addEventListener("submit", handleSubmitForm1);
-if (form2) form2.addEventListener("submit", handleSubmitForm2);
+if (form1) {
+  form1.addEventListener("submit", handleSubmitForm1);
+}
+
+if (form2) {
+  form2.addEventListener("submit", handleSubmitForm2);
+}
