@@ -137,6 +137,7 @@ body {
 }
 
 .header-content {
+  text-align: center;
   padding: 24px 28px;
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.08));
   border-bottom: 1px solid var(--border);
