@@ -38,7 +38,8 @@ let dependenteIndex = 0;
 // ===============================
 // CONFIGURAÇÕES
 // ===============================
-const WHATSAPP_DESTINO = "5591981643641";
+let planoSaudePromptShown = false;
+let planoSaudeObserver = null;
 
 // ===============================
 // PALETA / TEMA
@@ -72,6 +73,7 @@ function abrirModoDigital() {
 
   setTimeout(() => {
     initAllSignaturePads();
+    watchPlanoSaudeSection();
   }, 100);
 }
 
@@ -252,6 +254,17 @@ function addWrappedText(doc, text, x, y, maxWidth, options = {}) {
   const lines = doc.splitTextToSize(text || "-", maxWidth);
   doc.text(lines, x, y, options);
   return y + (lines.length * (options.lineHeightFactor || 1.3) * (doc.getFontSize() / 2.6));
+}
+
+function getFieldBySelectors(root, selectors) {
+  if (!root || !selectors || !selectors.length) return null;
+
+  for (const selector of selectors) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+  }
+
+  return null;
 }
 
 // ===============================
@@ -453,6 +466,231 @@ clearSignatureButtons.forEach((button) => {
 });
 
 // ===============================
+// ALERTA / CÓPIA DE DADOS - FORM 2
+// ===============================
+function getForm2PreviousFields() {
+  if (!form2) return {};
+
+  return {
+    nome: getFieldBySelectors(form2, ['#f2_nome', 'input[name="nome"]']),
+    rg: getFieldBySelectors(form2, ['#f2_rg', 'input[name="rg"]']),
+    cpf: getFieldBySelectors(form2, ['#f2_cpf', 'input[name="cpf"]']),
+    sexo: getFieldBySelectors(form2, ['#f2_sexo', 'select[name="sexo"]', 'input[name="sexo"]']),
+    nascimento: getFieldBySelectors(form2, ['#f2_nascimento', 'input[name="nascimento"]']),
+    nomeMae: getFieldBySelectors(form2, ['#f2_nomeMae', 'input[name="nomeMae"]']),
+    cep: getFieldBySelectors(form2, ['#f2_cep', 'input[name="cep"]']),
+    endereco: getFieldBySelectors(form2, ['#f2_endereco', 'input[name="endereco"]']),
+    bairro: getFieldBySelectors(form2, ['#f2_bairro', 'input[name="bairro"]']),
+    cidade: getFieldBySelectors(form2, ['#f2_cidade', 'input[name="cidade"]']),
+    uf: getFieldBySelectors(form2, ['#f2_uf', 'input[name="uf"]', 'select[name="uf"]']),
+    telefone: getFieldBySelectors(form2, ['#f2_telefone', 'input[name="telefone"]']),
+    email: getFieldBySelectors(form2, ['#f2_email', 'input[name="email"]']),
+  };
+}
+
+function getForm2PlanoSaudeFields() {
+  if (!form2) return {};
+
+  return {
+    nome: getFieldBySelectors(form2, ['#f2b_nome', 'input[name="nome_adicional"]']),
+    rg: getFieldBySelectors(form2, ['#f2b_rg', 'input[name="rg_adicional"]']),
+    cpf: getFieldBySelectors(form2, ['#f2b_cpf', 'input[name="cpf_adicional"]']),
+    sexo: getFieldBySelectors(form2, ['#f2b_sexo', 'select[name="sexo_adicional"]', 'input[name="sexo_adicional"]']),
+    nascimento: getFieldBySelectors(form2, ['#f2b_nascimento', 'input[name="nascimento_adicional"]']),
+    nomeMae: getFieldBySelectors(form2, ['#f2b_nomeMae', 'input[name="nomeMae_adicional"]']),
+    cep: getFieldBySelectors(form2, ['#f2b_cep', 'input[name="cep_adicional"]']),
+    endereco: getFieldBySelectors(form2, ['#f2b_endereco', 'input[name="endereco_adicional"]']),
+    bairro: getFieldBySelectors(form2, ['#f2b_bairro', 'input[name="bairro_adicional"]']),
+    cidade: getFieldBySelectors(form2, ['#f2b_cidade', 'input[name="cidade_adicional"]']),
+    uf: getFieldBySelectors(form2, ['#f2b_uf', 'input[name="uf_adicional"]', 'select[name="uf_adicional"]']),
+    telefone: getFieldBySelectors(form2, ['#f2b_telefone', 'input[name="telefone_adicional"]']),
+    email: getFieldBySelectors(form2, ['#f2b_email', 'input[name="email_adicional"]']),
+  };
+}
+
+function hasAnyPreviousForm2Data() {
+  const fields = getForm2PreviousFields();
+
+  return Object.values(fields).some((field) => {
+    if (!field) return false;
+    return String(field.value || "").trim() !== "";
+  });
+}
+
+function copyForm2DataToPlanoSaude() {
+  const source = getForm2PreviousFields();
+  const target = getForm2PlanoSaudeFields();
+
+  Object.keys(source).forEach((key) => {
+    if (!source[key] || !target[key]) return;
+    target[key].value = source[key].value || "";
+    target[key].dispatchEvent(new Event("input", { bubbles: true }));
+    target[key].dispatchEvent(new Event("change", { bubbles: true }));
+  });
+
+  if (target.cpf) target.cpf.value = formatCPF(target.cpf.value);
+  if (target.cep) target.cep.value = formatCEP(target.cep.value);
+  if (target.telefone) target.telefone.value = formatPhone(target.telefone.value);
+}
+
+function closePlanoSaudePrompt() {
+  const overlay = document.getElementById("plano-saude-alert-overlay");
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function showPlanoSaudePrompt() {
+  if (planoSaudePromptShown) return;
+  if (!hasAnyPreviousForm2Data()) return;
+
+  planoSaudePromptShown = true;
+  closePlanoSaudePrompt();
+
+  const overlay = document.createElement("div");
+  overlay.id = "plano-saude-alert-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(15, 23, 42, 0.55)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.padding = "20px";
+  overlay.style.zIndex = "9999";
+
+  const modal = document.createElement("div");
+  modal.style.width = "100%";
+  modal.style.maxWidth = "520px";
+  modal.style.background = "#FFFFFF";
+  modal.style.borderRadius = "16px";
+  modal.style.boxShadow = "0 24px 80px rgba(0,0,0,0.22)";
+  modal.style.padding = "24px";
+  modal.style.fontFamily = "inherit";
+  modal.style.textAlign = "center";
+
+  const title = document.createElement("h3");
+  title.textContent = "Clube de Benefícios Planos de Saúde";
+  title.style.margin = "0 0 12px";
+  title.style.fontSize = "22px";
+  title.style.color = "#111827";
+
+  const message = document.createElement("p");
+  message.textContent = "Gostaria de utilizar os mesmos dados para preencher os campos abaixo ?";
+  message.style.margin = "0 0 22px";
+  message.style.fontSize = "16px";
+  message.style.lineHeight = "1.5";
+  message.style.color = "#374151";
+
+  const actions = document.createElement("div");
+  actions.style.display = "flex";
+  actions.style.gap = "12px";
+  actions.style.justifyContent = "center";
+  actions.style.flexWrap = "wrap";
+
+  const yesButton = document.createElement("button");
+  yesButton.type = "button";
+  yesButton.textContent = "SIM";
+  yesButton.style.border = "none";
+  yesButton.style.borderRadius = "10px";
+  yesButton.style.padding = "12px 28px";
+  yesButton.style.fontSize = "15px";
+  yesButton.style.fontWeight = "700";
+  yesButton.style.cursor = "pointer";
+  yesButton.style.background = "#16A34A";
+  yesButton.style.color = "#FFFFFF";
+
+  const noButton = document.createElement("button");
+  noButton.type = "button";
+  noButton.textContent = "NÃO";
+  noButton.style.border = "none";
+  noButton.style.borderRadius = "10px";
+  noButton.style.padding = "12px 28px";
+  noButton.style.fontSize = "15px";
+  noButton.style.fontWeight = "700";
+  noButton.style.cursor = "pointer";
+  noButton.style.background = "#DC2626";
+  noButton.style.color = "#FFFFFF";
+
+  yesButton.addEventListener("click", () => {
+    copyForm2DataToPlanoSaude();
+    closePlanoSaudePrompt();
+  });
+
+  noButton.addEventListener("click", () => {
+    closePlanoSaudePrompt();
+  });
+
+  actions.appendChild(yesButton);
+  actions.appendChild(noButton);
+
+  modal.appendChild(title);
+  modal.appendChild(message);
+  modal.appendChild(actions);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function findPlanoSaudeSection() {
+  if (!form2) return null;
+
+  const directSelectors = [
+    "#plano-saude-section",
+    "#form2-plano-saude",
+    "#clube-beneficios-planos-saude",
+    '[data-section="clube-beneficios-planos-saude"]',
+    ".clube-beneficios-planos-saude",
+  ];
+
+  for (const selector of directSelectors) {
+    const el = form2.querySelector(selector);
+    if (el) return el;
+  }
+
+  const possibleNodes = form2.querySelectorAll("section, div, fieldset");
+  for (const node of possibleNodes) {
+    const text = (node.textContent || "").toLowerCase().replace(/\s+/g, " ").trim();
+
+    if (
+      text.includes("clube de benefícios planos de saúde") ||
+      text.includes("clube de beneficios planos de saude") ||
+      text.includes("planos de saúde") ||
+      text.includes("planos de saude")
+    ) {
+      return node;
+    }
+  }
+
+  return null;
+}
+
+function watchPlanoSaudeSection() {
+  if (!form2) return;
+
+  if (planoSaudeObserver) {
+    planoSaudeObserver.disconnect();
+    planoSaudeObserver = null;
+  }
+
+  const planoSection = findPlanoSaudeSection();
+  if (!planoSection) return;
+
+  planoSaudeObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          showPlanoSaudePrompt();
+        }
+      });
+    },
+    {
+      threshold: 0.35,
+    }
+  );
+
+  planoSaudeObserver.observe(planoSection);
+}
+
+// ===============================
 // ALTERNAR FORM
 // ===============================
 function alternarFormulario() {
@@ -474,6 +712,7 @@ function alternarFormulario() {
 
   setTimeout(() => {
     initAllSignaturePads();
+    watchPlanoSaudeSection();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, 50);
 }
@@ -582,54 +821,58 @@ function getFieldsForSections(targetForm, data) {
     ];
   }
 
-  return [
-    {
-      title: "Dados pessoais",
-      items: [
-        ["Nome", data.nome],
-        ["RG", data.rg],
-        ["CPF", data.cpf],
-        ["Sexo", data.sexo],
-        ["Data do nascimento", data.nascimento],
-        ["Nome da mãe", data.nomeMae],
-      ],
-    },
-    {
-      title: "Dados para contato",
-      items: [
-        ["CEP", data.cep],
-        ["Endereço", data.endereco],
-        ["Bairro", data.bairro],
-        ["Cidade", data.cidade],
-        ["UF", data.uf],
-        ["Telefone WhatsApp", data.telefone],
-        ["E-mail", data.email],
-      ],
-    },
-    {
-      title: "Dados pessoais adicionais",
-      items: [
-        ["Nome", data.nomeAdicional],
-        ["RG", data.rgAdicional],
-        ["CPF", data.cpfAdicional],
-        ["Sexo", data.sexoAdicional],
-        ["Data do nascimento", data.nascimentoAdicional],
-        ["Nome da mãe", data.nomeMaeAdicional],
-      ],
-    },
-    {
-      title: "Dados para contato adicionais",
-      items: [
-        ["CEP", data.cepAdicional],
-        ["Endereço", data.enderecoAdicional],
-        ["Bairro", data.bairroAdicional],
-        ["Cidade", data.cidadeAdicional],
-        ["UF", data.ufAdicional],
-        ["Telefone WhatsApp", data.telefoneAdicional],
-        ["E-mail", data.emailAdicional],
-      ],
-    },
-  ];
+  return {
+    titular: [
+      {
+        title: "Dados pessoais do titular",
+        items: [
+          ["Nome", data.nome],
+          ["RG", data.rg],
+          ["CPF", data.cpf],
+          ["Sexo", data.sexo],
+          ["Data do nascimento", data.nascimento],
+          ["Nome da mãe", data.nomeMae],
+        ],
+      },
+      {
+        title: "Dados para contato do titular",
+        items: [
+          ["CEP", data.cep],
+          ["Endereço", data.endereco],
+          ["Bairro", data.bairro],
+          ["Cidade", data.cidade],
+          ["UF", data.uf],
+          ["Telefone WhatsApp", data.telefone],
+          ["E-mail", data.email],
+        ],
+      },
+    ],
+    planoSaude: [
+      {
+        title: "Clube de Beneficios Planos de Saude",
+        items: [
+          ["Nome", data.nomeAdicional],
+          ["RG", data.rgAdicional],
+          ["CPF", data.cpfAdicional],
+          ["Sexo", data.sexoAdicional],
+          ["Data do nascimento", data.nascimentoAdicional],
+          ["Nome da mãe", data.nomeMaeAdicional],
+        ],
+      },
+      {
+        title: "Contato do plano de saude",
+        items: [
+          ["CEP", data.cepAdicional],
+          ["Endereço", data.enderecoAdicional],
+          ["Bairro", data.bairroAdicional],
+          ["Cidade", data.cidadeAdicional],
+          ["UF", data.ufAdicional],
+          ["Telefone WhatsApp", data.telefoneAdicional],
+          ["E-mail", data.emailAdicional],
+        ],
+      },
+    ],
+  };
 }
 
 // ===============================
@@ -644,6 +887,24 @@ function drawSectionTitle(doc, title, y) {
   doc.text(title.toUpperCase(), 18, y + 5.4);
   doc.setTextColor(31, 41, 55);
   return y + 12;
+}
+
+function drawSubFormHeader(doc, title, subtitle, y) {
+  doc.setFillColor(15, 23, 42);
+  doc.roundedRect(14, y, 182, 16, 3, 3, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(title, 18, y + 6.5);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.text(subtitle, 18, y + 11.8);
+
+  doc.setTextColor(17, 24, 39);
+
+  return y + 22;
 }
 
 function drawFieldCard(doc, label, value, x, y, width, minHeight = 16) {
@@ -718,10 +979,10 @@ async function gerarPdfBlob(targetForm, data) {
   doc.setTextColor(17, 24, 39);
   let y = 54;
 
-  y = renderSectionCards(doc, sections[0], y, 2);
-  y = renderSectionCards(doc, sections[1], y + 2, 2);
-
   if (targetForm.id === "cadastroForm1") {
+    y = renderSectionCards(doc, sections[0], y, 2);
+    y = renderSectionCards(doc, sections[1], y + 2, 2);
+
     const section3 = sections[2];
 
     if (y > 220) {
@@ -774,13 +1035,32 @@ async function gerarPdfBlob(targetForm, data) {
 
     y = doc.lastAutoTable.finalY + 10;
   } else {
-    if (y > 170) {
+    y = drawSubFormHeader(
+      doc,
+      "Formulario Principal",
+      "Dados do titular",
+      y
+    );
+
+    y = renderSectionCards(doc, sections.titular[0], y, 2);
+    y = renderSectionCards(doc, sections.titular[1], y + 2, 2);
+
+    if (y > 180) {
       doc.addPage();
       y = 18;
+    } else {
+      y += 4;
     }
 
-    y = renderSectionCards(doc, sections[2], y + 2, 2);
-    y = renderSectionCards(doc, sections[3], y + 2, 2);
+    y = drawSubFormHeader(
+      doc,
+      "Clube de Beneficios Planos de Saude",
+      "Preenchimento separado dentro do mesmo PDF",
+      y
+    );
+
+    y = renderSectionCards(doc, sections.planoSaude[0], y, 2);
+    y = renderSectionCards(doc, sections.planoSaude[1], y + 2, 2);
   }
 
   if (y > 215) {
@@ -813,14 +1093,15 @@ async function gerarPdfBlob(targetForm, data) {
   }
 
   doc.setFillColor(239, 246, 255);
-  doc.roundedRect(118, y + 6, 68, 24, 3, 3, "F");
+  doc.roundedRect(118, y + 6, 68, 20, 3, 3, "F");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  doc.text("Dados do envio", 124, y + 13);
+  doc.text("Dados do arquivo", 124, y + 13);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
-  addWrappedText(doc, `Arquivo: ${pdfFileName}`, 124, y + 18, 56, { lineHeightFactor: 1.2 });
-  addWrappedText(doc, `Destino: ${WHATSAPP_DESTINO}`, 124, y + 28, 56, { lineHeightFactor: 1.2 });
+  addWrappedText(doc, `Arquivo: ${pdfFileName}`, 124, y + 18, 56, {
+    lineHeightFactor: 1.2,
+  });
 
   const totalPages = doc.getNumberOfPages();
   for (let page = 1; page <= totalPages; page += 1) {
@@ -836,50 +1117,6 @@ async function gerarPdfBlob(targetForm, data) {
     blob: doc.output("blob"),
     fileName: pdfFileName,
   };
-}
-
-// ===============================
-// WHATSAPP
-// ===============================
-function formatWhatsAppNumber(value) {
-  const digits = onlyNumbers(value);
-  if (!digits) return "";
-  return digits.startsWith("55") ? digits : `55${digits}`;
-}
-
-function getWhatsAppTarget() {
-  return formatWhatsAppNumber(WHATSAPP_DESTINO);
-}
-
-function buildWhatsAppMessage(targetForm, data, fileName) {
-  const tipoFormulario =
-    targetForm.id === "cadastroForm1"
-      ? "Cadastro completo"
-      : "Cadastro alternativo";
-
-  return [
-    "Olá! Segue o formulário preenchido em PDF.",
-    "",
-    `Tipo: ${tipoFormulario}`,
-    `Nome: ${data.nome || "Não informado"}`,
-    `CPF: ${data.cpf || "Não informado"}`,
-    `Telefone: ${data.telefone || "Não informado"}`,
-    `Arquivo: ${fileName}`,
-  ].join("\n");
-}
-
-async function compartilharPdfNoWhatsApp(targetForm, data, pdfBlob, fileName) {
-  const whatsappNumber = getWhatsAppTarget();
-  const message = buildWhatsAppMessage(targetForm, data, fileName);
-
-  const encodedMessage = encodeURIComponent(
-    `${message}\n\nO PDF foi baixado no dispositivo. Anexe-o para concluir o envio.`
-  );
-
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-  window.location.href = whatsappUrl;
-
-  return "redirected";
 }
 
 // ===============================
@@ -912,21 +1149,15 @@ async function processarEnvio(targetForm) {
     const { blob, fileName } = await gerarPdfBlob(targetForm, data);
 
     if (submitButton) {
-      submitButton.textContent = "Abrindo WhatsApp...";
+      submitButton.textContent = "Baixando PDF...";
     }
 
     triggerBlobDownload(blob, fileName);
 
-    const result = await compartilharPdfNoWhatsApp(targetForm, data, blob, fileName);
-
-    if (result === "shared") {
-      alert("PDF gerado e compartilhado com sucesso.");
-    } else {
-      alert("PDF gerado com sucesso. Você será redirecionado ao WhatsApp para concluir o envio.");
-    }
+    alert("PDF gerado e baixado com sucesso.");
   } catch (error) {
-    console.error("Erro ao gerar PDF ou iniciar envio:", error);
-    alert("Não foi possível gerar o PDF ou iniciar o envio pelo WhatsApp.");
+    console.error("Erro ao gerar PDF:", error);
+    alert("Não foi possível gerar o PDF.");
   } finally {
     if (submitButton) {
       submitButton.textContent = "Enviar formulário";
@@ -954,3 +1185,7 @@ if (form1) {
 if (form2) {
   form2.addEventListener("submit", handleSubmitForm2);
 }
+
+window.addEventListener("load", () => {
+  watchPlanoSaudeSection();
+});
