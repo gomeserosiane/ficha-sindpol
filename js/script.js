@@ -36,6 +36,11 @@ let signaturePad2;
 let dependenteIndex = 0;
 
 // ===============================
+// CONFIGURAÇÕES
+// ===============================
+const WHATSAPP_DESTINO = "5591981643641";
+
+// ===============================
 // PALETA / TEMA
 // ===============================
 const THEME = {
@@ -73,7 +78,7 @@ function abrirModoDigital() {
 function baixarPDFManual() {
   const link = document.createElement("a");
   link.href = "docs/ficha-manual.pdf";
-  link.download = "ficha-manual1.pdf", "ficha-manual2";
+  link.download = "ficha-manual.pdf";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -243,48 +248,10 @@ function triggerBlobDownload(blob, fileName) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function downloadDataUrl(dataUrl, fileName) {
-  const link = document.createElement("a");
-  link.href = dataUrl;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-function autoFitColumns(worksheet, minWidth = 14, maxWidth = 45) {
-  worksheet.columns.forEach((column) => {
-    let maxLength = minWidth;
-
-    column.eachCell({ includeEmpty: true }, (cell) => {
-      const raw = cell.value;
-      let cellValue = "";
-
-      if (raw === null || raw === undefined) {
-        cellValue = "";
-      } else if (typeof raw === "object" && raw.richText) {
-        cellValue = raw.richText.map((r) => r.text).join("");
-      } else {
-        cellValue = String(raw);
-      }
-
-      const lines = cellValue.split("\n");
-      lines.forEach((line) => {
-        maxLength = Math.max(maxLength, line.length + 2);
-      });
-    });
-
-    column.width = Math.min(maxLength, maxWidth);
-  });
-}
-
-function applyCellBorder(cell) {
-  cell.border = {
-    top: { style: "thin", color: { argb: THEME.border } },
-    left: { style: "thin", color: { argb: THEME.border } },
-    bottom: { style: "thin", color: { argb: THEME.border } },
-    right: { style: "thin", color: { argb: THEME.border } },
-  };
+function addWrappedText(doc, text, x, y, maxWidth, options = {}) {
+  const lines = doc.splitTextToSize(text || "-", maxWidth);
+  doc.text(lines, x, y, options);
+  return y + (lines.length * (options.lineHeightFactor || 1.3) * (doc.getFontSize() / 2.6));
 }
 
 // ===============================
@@ -666,249 +633,253 @@ function getFieldsForSections(targetForm, data) {
 }
 
 // ===============================
-// EXCEL
+// PDF
 // ===============================
-async function gerarExcel(targetForm, data) {
-  const workbook = new ExcelJS.Workbook();
-  workbook.creator = "ChatGPT";
-  workbook.created = new Date();
-  workbook.modified = new Date();
+function drawSectionTitle(doc, title, y) {
+  doc.setFillColor(31, 78, 121);
+  doc.roundedRect(14, y, 182, 8, 2, 2, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(title.toUpperCase(), 18, y + 5.4);
+  doc.setTextColor(31, 41, 55);
+  return y + 12;
+}
 
+function drawFieldCard(doc, label, value, x, y, width, minHeight = 16) {
+  const normalizedValue = value && String(value).trim() ? String(value).trim() : "Não informado";
+  const valueLines = doc.splitTextToSize(normalizedValue, width - 8);
+  const dynamicHeight = Math.max(minHeight, 9 + (valueLines.length * 5.2));
+
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(209, 213, 219);
+  doc.roundedRect(x, y, width, dynamicHeight, 3, 3, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(107, 114, 128);
+  doc.text(label, x + 4, y + 5);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(17, 24, 39);
+  doc.text(valueLines, x + 4, y + 11);
+
+  return dynamicHeight;
+}
+
+function renderSectionCards(doc, section, startY, columns = 2) {
+  let y = drawSectionTitle(doc, section.title, startY);
+  const gap = 6;
+  const totalWidth = 182;
+  const cardWidth = columns === 1 ? totalWidth : (totalWidth - gap) / 2;
+
+  for (let i = 0; i < section.items.length; i += columns) {
+    const rowItems = section.items.slice(i, i + columns);
+    const heights = rowItems.map(([label, value], index) => {
+      const x = 14 + index * (cardWidth + gap);
+      return drawFieldCard(doc, label, value, x, y, cardWidth);
+    });
+
+    y += Math.max(...heights) + gap;
+  }
+
+  return y;
+}
+
+async function gerarPdfBlob(targetForm, data) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
   const logoDataURL = await imageElementToDataURL(getHeaderImageElement(targetForm));
   const signatureDataURL = getSignatureDataURL(targetForm);
-
-  const ws = workbook.addWorksheet("Cadastro", {
-    views: [{ state: "frozen", ySplit: 4 }],
-  });
-  ws.properties.tabColor = { argb: THEME.blue };
-
-  ws.mergeCells("A1:D1");
-  ws.getCell("A1").value = "CADASTRO";
-  ws.getCell("A1").font = {
-    name: "Calibri",
-    size: 16,
-    bold: true,
-    color: { argb: THEME.white },
-  };
-  ws.getCell("A1").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: THEME.blue },
-  };
-  ws.getCell("A1").alignment = { vertical: "middle", horizontal: "left" };
-  ws.getRow(1).height = 28;
-
-  ws.mergeCells("A2:D2");
-  ws.getCell("A2").value = `Gerado em ${new Date().toLocaleString("pt-BR")}`;
-  ws.getCell("A2").font = { name: "Calibri", size: 10, color: { argb: THEME.gray } };
-  ws.getCell("A2").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: THEME.blueSoft },
-  };
-
-  if (logoDataURL) {
-    const logoId = workbook.addImage({
-      base64: logoDataURL,
-      extension: "png",
-    });
-
-    ws.addImage(logoId, {
-      tl: { col: 3.1, row: 0.15 },
-      ext: { width: 150, height: 55 },
-    });
-  }
-
-  let currentRow = 5;
+  const generatedAt = new Date().toLocaleString("pt-BR");
+  const pdfFileName = getBaseFileName(targetForm, ".pdf");
   const sections = getFieldsForSections(targetForm, data);
 
-  sections.forEach((section) => {
-    ws.mergeCells(`A${currentRow}:D${currentRow}`);
-    const titleCell = ws.getCell(`A${currentRow}`);
-    titleCell.value = section.title.toUpperCase();
-    titleCell.font = { bold: true, color: { argb: THEME.white }, size: 11 };
-    titleCell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: THEME.green },
-    };
-    currentRow++;
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, 210, 38, "F");
+  doc.setFillColor(31, 78, 121);
+  doc.rect(0, 38, 210, 8, "F");
 
-    section.items.forEach(([label, value]) => {
-      ws.getCell(`A${currentRow}`).value = label;
-      ws.getCell(`A${currentRow}`).font = { bold: true, color: { argb: THEME.dark } };
-      ws.getCell(`A${currentRow}`).fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "F3F4F6" },
-      };
+  if (logoDataURL) {
+    doc.addImage(logoDataURL, "PNG", 14, 8, 42, 20, undefined, "FAST");
+  }
 
-      ws.mergeCells(`B${currentRow}:D${currentRow}`);
-      ws.getCell(`B${currentRow}`).value = value || "-";
-      ws.getCell(`B${currentRow}`).alignment = {
-        vertical: "middle",
-        horizontal: "left",
-        wrapText: true,
-      };
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("Formulario de Cadastro", 64, 17);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text("Resumo preenchido para envio e conferência", 64, 24);
+  doc.setFontSize(9);
+  doc.text(`Gerado em ${generatedAt}`, 64, 30);
 
-      applyCellBorder(ws.getCell(`A${currentRow}`));
-      applyCellBorder(ws.getCell(`B${currentRow}`));
-      applyCellBorder(ws.getCell(`C${currentRow}`));
-      applyCellBorder(ws.getCell(`D${currentRow}`));
+  doc.setTextColor(17, 24, 39);
+  let y = 54;
 
-      currentRow++;
-    });
-
-    currentRow++;
-  });
+  y = renderSectionCards(doc, sections[0], y, 2);
+  y = renderSectionCards(doc, sections[1], y + 2, 2);
 
   if (targetForm.id === "cadastroForm1") {
-    const dependentes = getDependentes();
-    const depWs = workbook.addWorksheet("Dependentes", {
-      views: [{ state: "frozen", ySplit: 3 }],
-    });
-    depWs.properties.tabColor = { argb: THEME.green };
+    const section3 = sections[2];
 
-    depWs.mergeCells("A1:D1");
-    depWs.getCell("A1").value = "DEPENDENTES";
-    depWs.getCell("A1").font = {
-      name: "Calibri",
-      size: 15,
-      bold: true,
-      color: { argb: THEME.white },
-    };
-    depWs.getCell("A1").fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: THEME.blue },
-    };
-
-    const headerRow = depWs.getRow(3);
-    ["#", "Nome", "Parentesco", "Data de nascimento"].forEach((title, index) => {
-      const cell = headerRow.getCell(index + 1);
-      cell.value = title;
-      cell.font = { bold: true, color: { argb: THEME.white } };
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: THEME.green },
-      };
-      applyCellBorder(cell);
-      cell.alignment = { vertical: "middle", horizontal: "center" };
-    });
-
-    if (dependentes.length) {
-      dependentes.forEach((dep, index) => {
-        const row = depWs.getRow(4 + index);
-        row.values = [index + 1, dep.nome || "-", dep.parentesco || "-", dep.nascimento || "-"];
-        row.eachCell((cell) => {
-          applyCellBorder(cell);
-          cell.alignment = { vertical: "middle", horizontal: "left", wrapText: true };
-        });
-      });
-    } else {
-      const row = depWs.getRow(4);
-      row.values = ["", "Nenhum dependente informado", "", ""];
-      row.eachCell((cell) => applyCellBorder(cell));
+    if (y > 220) {
+      doc.addPage();
+      y = 18;
     }
 
-    autoFitColumns(depWs, 12, 35);
+    y = renderSectionCards(doc, section3, y + 2, 2);
+
+    const dependentes = getDependentes();
+    y += 2;
+    y = drawSectionTitle(doc, "Dependentes", y);
+
+    const body = dependentes.length
+      ? dependentes.map((dep, index) => [
+          String(index + 1),
+          dep.nome || "Não informado",
+          dep.parentesco || "Não informado",
+          dep.nascimento || "Não informado",
+        ])
+      : [["-", "Nenhum dependente informado", "-", "-"]];
+
+    doc.autoTable({
+      startY: y,
+      margin: { left: 14, right: 14 },
+      head: [["#", "Nome", "Parentesco", "Nascimento"]],
+      body,
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2.4,
+        textColor: [31, 41, 55],
+        lineColor: [209, 213, 219],
+        lineWidth: 0.2,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [15, 118, 110],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      columnStyles: {
+        0: { halign: "center", cellWidth: 14 },
+        1: { cellWidth: 72 },
+        2: { cellWidth: 58 },
+        3: { halign: "center", cellWidth: 34 },
+      },
+    });
+
+    y = doc.lastAutoTable.finalY + 10;
+  } else {
+    if (y > 170) {
+      doc.addPage();
+      y = 18;
+    }
+
+    y = renderSectionCards(doc, sections[2], y + 2, 2);
+    y = renderSectionCards(doc, sections[3], y + 2, 2);
   }
 
-  const signWs = workbook.addWorksheet("Assinatura");
-  signWs.properties.tabColor = { argb: THEME.blueMid };
+  if (y > 215) {
+    doc.addPage();
+    y = 18;
+  }
 
-  signWs.mergeCells("A1:D1");
-  signWs.getCell("A1").value = "ASSINATURA DIGITAL";
-  signWs.getCell("A1").font = { size: 15, bold: true, color: { argb: THEME.white } };
-  signWs.getCell("A1").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: THEME.blue },
-  };
+  y = drawSectionTitle(doc, "Assinatura digital", y + 2);
+
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(209, 213, 219);
+  doc.roundedRect(14, y, 182, 42, 3, 3, "FD");
 
   if (signatureDataURL) {
-    const signImageId = workbook.addImage({
-      base64: signatureDataURL,
-      extension: "png",
-    });
-
-    signWs.addImage(signImageId, {
-      tl: { col: 0.3, row: 2 },
-      ext: { width: 320, height: 120 },
-    });
+    doc.addImage(signatureDataURL, "PNG", 22, y + 5, 70, 24, undefined, "FAST");
+    doc.setDrawColor(148, 163, 184);
+    doc.line(22, y + 32, 104, y + 32);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(data.nome || "Assinante", 22, y + 38);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(107, 114, 128);
+    doc.text("Assinatura digital do titular", 22, y + 41.5);
+    doc.setTextColor(17, 24, 39);
   } else {
-    signWs.getCell("A3").value = "Assinatura não informada.";
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
+    doc.text("Assinatura não informada.", 22, y + 20);
   }
 
-  ws.columns = [
-    { key: "a", width: 24 },
-    { key: "b", width: 24 },
-    { key: "c", width: 24 },
-    { key: "d", width: 24 },
-  ];
+  doc.setFillColor(239, 246, 255);
+  doc.roundedRect(118, y + 6, 68, 24, 3, 3, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("Dados do envio", 124, y + 13);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  addWrappedText(doc, `Arquivo: ${pdfFileName}`, 124, y + 18, 56, { lineHeightFactor: 1.2 });
+  addWrappedText(doc, `Destino: ${WHATSAPP_DESTINO}`, 124, y + 28, 56, { lineHeightFactor: 1.2 });
 
-  autoFitColumns(ws, 16, 38);
-  autoFitColumns(signWs, 16, 35);
+  const totalPages = doc.getNumberOfPages();
+  for (let page = 1; page <= totalPages; page += 1) {
+    doc.setPage(page);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Pagina ${page} de ${totalPages}`, 170, 290);
+    doc.text("Sindpol & Grupo Blue", 14, 290);
+  }
 
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob(
-    [buffer],
-    { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+  return {
+    blob: doc.output("blob"),
+    fileName: pdfFileName,
+  };
+}
+
+// ===============================
+// WHATSAPP
+// ===============================
+function formatWhatsAppNumber(value) {
+  const digits = onlyNumbers(value);
+  if (!digits) return "";
+  return digits.startsWith("55") ? digits : `55${digits}`;
+}
+
+function getWhatsAppTarget() {
+  return formatWhatsAppNumber(WHATSAPP_DESTINO);
+}
+
+function buildWhatsAppMessage(targetForm, data, fileName) {
+  const tipoFormulario =
+    targetForm.id === "cadastroForm1"
+      ? "Cadastro completo"
+      : "Cadastro alternativo";
+
+  return [
+    "Olá! Segue o formulário preenchido em PDF.",
+    "",
+    `Tipo: ${tipoFormulario}`,
+    `Nome: ${data.nome || "Não informado"}`,
+    `CPF: ${data.cpf || "Não informado"}`,
+    `Telefone: ${data.telefone || "Não informado"}`,
+    `Arquivo: ${fileName}`,
+  ].join("\n");
+}
+
+async function compartilharPdfNoWhatsApp(targetForm, data, pdfBlob, fileName) {
+  const whatsappNumber = getWhatsAppTarget();
+  const message = buildWhatsAppMessage(targetForm, data, fileName);
+
+  const encodedMessage = encodeURIComponent(
+    `${message}\n\nO PDF foi baixado no dispositivo. Anexe-o para concluir o envio.`
   );
 
-  triggerBlobDownload(blob, getBaseFileName(targetForm, ".xlsx"));
-}
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  window.location.href = whatsappUrl;
 
-// ===============================
-// PRINT EXATO EM JPG
-// ===============================
-function lockFormVisualState(targetForm) {
-  const fields = targetForm.querySelectorAll("input, select, textarea");
-
-  fields.forEach((field) => {
-    if (field.tagName === "SELECT") {
-      const selectedValue = field.value;
-      [...field.options].forEach((option) => {
-        option.selected = option.value === selectedValue;
-      });
-    } else if (field.type === "checkbox" || field.type === "radio") {
-      field.defaultChecked = field.checked;
-    } else {
-      field.setAttribute("value", field.value || "");
-    }
-
-    field.blur();
-  });
-}
-
-async function gerarCanvasFormulario(targetForm) {
-  lockFormVisualState(targetForm);
-
-  const previousOverflow = document.body.style.overflow;
-  document.body.style.overflow = "visible";
-
-  await new Promise((resolve) => setTimeout(resolve, 250));
-
-  const canvas = await html2canvas(targetForm, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-    logging: false,
-    scrollX: 0,
-    scrollY: -window.scrollY,
-    windowWidth: document.documentElement.clientWidth,
-    windowHeight: document.documentElement.clientHeight,
-  });
-
-  document.body.style.overflow = previousOverflow;
-  return canvas;
-}
-
-async function gerarJPG(targetForm) {
-  const canvas = await gerarCanvasFormulario(targetForm);
-  const imageData = canvas.toDataURL("image/jpeg", 0.95);
-  downloadDataUrl(imageData, getBaseFileName(targetForm, ".jpg"));
+  return "redirected";
 }
 
 // ===============================
@@ -931,21 +902,31 @@ async function processarEnvio(targetForm) {
 
   try {
     if (submitButton) {
-      submitButton.textContent = "Gerando Excel e JPG...";
+      submitButton.textContent = "Gerando PDF...";
       submitButton.disabled = true;
     }
 
     targetForm.classList.add("loading");
 
     const data = getFormDataObject(targetForm);
+    const { blob, fileName } = await gerarPdfBlob(targetForm, data);
 
-    await gerarExcel(targetForm, data);
-    await gerarJPG(targetForm);
+    if (submitButton) {
+      submitButton.textContent = "Abrindo WhatsApp...";
+    }
 
-    alert("Planilha Excel e imagem JPG geradas com sucesso.");
+    triggerBlobDownload(blob, fileName);
+
+    const result = await compartilharPdfNoWhatsApp(targetForm, data, blob, fileName);
+
+    if (result === "shared") {
+      alert("PDF gerado e compartilhado com sucesso.");
+    } else {
+      alert("PDF gerado com sucesso. Você será redirecionado ao WhatsApp para concluir o envio.");
+    }
   } catch (error) {
-    console.error("Erro ao gerar arquivos:", error);
-    alert("Não foi possível gerar os arquivos Excel e JPG.");
+    console.error("Erro ao gerar PDF ou iniciar envio:", error);
+    alert("Não foi possível gerar o PDF ou iniciar o envio pelo WhatsApp.");
   } finally {
     if (submitButton) {
       submitButton.textContent = "Enviar formulário";
